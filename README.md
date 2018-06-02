@@ -1,4 +1,4 @@
-# LensQUEST (public beta v0.1)
+# lensQUEST (public beta v0.1)
 An implementation quadratic estimator for lensing extraction of full-sky CMB data in python, following Okamoto & Hu's paper [*CMB Lensing Reconstruction on the Full Sky*](https://arxiv.org/abs/astro-ph/0301031).
 
 ## Installation
@@ -31,14 +31,14 @@ questobject=lensquest.quest(maps, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCM
 questobject.grad(XY)
 # returns a_lm^Phi XY, where XY=TT,TE,EE,TB,EB or BB
 
-lensquest.quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, curl=False, rdcl=None, bias=False)
+lensquest.quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, bias=False)
 # returns dictionary of A_L (and N_L if bias=True) of TT or TT,TE,EE,TB,EB
 ```
 
 ## Contact
 Dominic Beck: dbeck [at] apc.in2p3.fr
 
-## License
+## License [![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://badges.mit-license.org)
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
