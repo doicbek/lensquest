@@ -26,9 +26,9 @@ in your local `lensquest` directory.
 ```python
 import lensquest
 
-questobject=lensquest.quest(maps, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None)
+questhelper=lensquest.quest(maps, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None)
 
-questobject.grad(XY)
+questhelper.grad(XY)
 # returns a_lm^Phi XY, where XY=TT,TE,EE,TB,EB or BB
 
 lensquest.quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, bias=False)
