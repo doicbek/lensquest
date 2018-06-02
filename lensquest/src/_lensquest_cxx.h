@@ -6,15 +6,12 @@
 #include <cassert>
 #include <omp.h>
 
-#include <fitshandle.h>
 #include <healpix_map.h>
-#include <healpix_map_fitsio.h>
 #include <alm.h>
 #include <alm_healpix_tools.h>
 #include <sharp_cxx.h>
 #include <powspec.h>
 #include <datatypes.h>
-#include "alm_fitsio.h"
 
 #include "wignerSymbols-cpp.cpp"
 #include "kernels.cpp"
