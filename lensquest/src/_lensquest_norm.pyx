@@ -28,6 +28,7 @@ cdef extern from "_lensquest_cxx.h":
 	cdef vector[ vector[double] ] makeAN(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
 	cdef vector[ vector[double] ] computeKernel(string stype, PowSpec &wcl, PowSpec &dcl, int lminCMB, int L)
+	cdef void lensCls(PowSpec& llcl, PowSpec& ulcl,vector[double] &clDD) 
 	cdef vector[double] lensBB(vector[double] &clEE, vector[double] &clDD, int lmax_out, cbool even)
 
 def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None, bias=False):
@@ -358,5 +359,33 @@ def lensbb(clee,clpp,lmax=None,even=False):
 	out=np.zeros(lmax_+1, dtype=np.float64)
 	for l in range(lmax_+1):
 		out[l]=clbb_[l]
+		
+	return out
+	
+def lenscls(ucl,clpp):
+	cdef int lmax_
+	
+	lmax_ul=len(ucl[0])-1
+	lmaxpp=len(clpp)-1
+
+	ucl_c = [np.ascontiguousarray(cl[:lmax_ul+1], dtype=np.float64) for cl in ucl]
+	ucl_=ndarray2cl4(ucl_c[0], ucl_c[1], ucl_c[2], ucl_c[3], lmax_ul)
+	
+	cdef vector[double] clpp_ = vector[double](lmaxpp+1,0.)
+	for l in range(lmaxpp+1):
+		clpp_[l]=clpp[l]
+		
+	lmax_=lmax_ul
+	
+	cdef PowSpec *lcl_=new PowSpec(4,lmax_)
+	
+	lensCls(lcl_[0],lcl_[0], clpp_)
+	
+	out=np.zeros((4,lmax_+1), dtype=np.float64)
+	for l in xrange(2,lmax_+1):
+		out[0][l]=lcl_.tg(l)
+		out[3][l]=lcl_.tg(l)
+		out[1][l]=lcl_.gg(l)
+		out[2][l]=lcl_.cc(l)
 		
 	return out
