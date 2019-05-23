@@ -1410,36 +1410,42 @@ void lensCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD) {
 	std::vector< std::vector<double> > F2(lmax_DD+1, std::vector<double>(lmax_ul+1,0.));
 	
 	for (size_t l1=0;l1<lmax_ll+1;l1++) {
-		compF(F0, l1, 0, lmax_DD+1, lmax_ul+1);
-		compF(F2, l1, 2, lmax_DD+1, lmax_ul+1);
-				
-		double TTout=0.;
-		double TEout=0.;
-		double EEout=0.;
-		double BBout=0.;
 		if (l1>=2) {
-			#pragma omp parallel for reduction(+:TTout,TEout,EEout,BBout)
+			compF(F0, l1, 0, lmax_DD+1, lmax_ul+1);
+			compF(F2, l1, 2, lmax_DD+1, lmax_ul+1);
+					
+			double TTout=0.;
+			double TEout=0.;
+			double TBout=0.;
+			double EEout=0.;
+			double EBout=0.;
+			double BBout=0.;
+			#pragma omp parallel for reduction(+:TTout,TEout,TBout,EEout,EBout,BBout)
 			for (size_t L=2;L<lmax_DD+1;L++) {
 				for (size_t l2=2;l2<lmax_ul+1;l2++) {
 					TTout+=F0[L][l2]*F0[L][l2]*clDD[L]*ulcl.tt(l2);
 					TEout+=F0[L][l2]*F2[L][l2]*clDD[L]*ulcl.tg(l2);
+					TBout+=F0[L][l2]*F2[L][l2]*clDD[L]*ulcl.tc(l2);
 					if ((l1+L+l2)%2!=0) {
 						EEout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
+						EBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
 						BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gg(l2);
 					}
 					else{
 						EEout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gg(l2);
-						BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
+						EBout+=-F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
+						// BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
 					}
 				}
 			}
+		
+			llcl.tt(l1)=TTout*1./(2.*l1+1.);
+			llcl.tg(l1)=TEout*1./(2.*l1+1.);
+			llcl.tc(l1)=TBout*1./(2.*l1+1.);
+			llcl.gg(l1)=EEout*1./(2.*l1+1.);
+			llcl.gc(l1)=EBout*1./(2.*l1+1.);
+			llcl.cc(l1)=BBout*1./(2.*l1+1.);
 		}
-
-
-		llcl.tt(l1)=TTout*1./(2.*l1+1.);
-		llcl.tg(l1)=TEout*1./(2.*l1+1.);
-		llcl.gg(l1)=EEout*1./(2.*l1+1.);
-		llcl.cc(l1)=BBout*1./(2.*l1+1.);
 						
 		if(PyErr_CheckSignals() == -1) {
 			throw invalid_argument( "Keyboard interrupt" );

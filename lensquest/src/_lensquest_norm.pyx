@@ -369,7 +369,9 @@ def lenscls(ucl,clpp):
 	lmaxpp=len(clpp)-1
 
 	ucl_c = [np.ascontiguousarray(cl[:lmax_ul+1], dtype=np.float64) for cl in ucl]
-	ucl_=ndarray2cl4(ucl_c[0], ucl_c[1], ucl_c[2], ucl_c[3], lmax_ul)
+	if len(ucl_c)==6: ucl_=ndarray2cl6(ucl_c[0], ucl_c[1], ucl_c[2], ucl_c[3], ucl_c[4], ucl_c[5], lmax_ul)
+	else: raise NotImplementedError('Input spectra should be in an array of length 6: %d given'%len(ucl_c))
+		
 	
 	cdef vector[double] clpp_ = vector[double](lmaxpp+1,0.)
 	for l in range(lmaxpp+1):
@@ -377,15 +379,20 @@ def lenscls(ucl,clpp):
 		
 	lmax_=lmax_ul
 	
-	cdef PowSpec *lcl_=new PowSpec(4,lmax_)
+	cdef PowSpec *lcl_=new PowSpec(6,lmax_)
 	
-	lensCls(lcl_[0],lcl_[0], clpp_)
+	lensCls(lcl_[0], ucl_[0], clpp_)
 	
-	out=np.zeros((4,lmax_+1), dtype=np.float64)
+	l=np.arange(len(clpp))
+	R=.5*np.sum(l*(l+1)*(2*l+1)/4./np.pi*clpp)
+	
+	out=np.zeros((6,lmax_+1), dtype=np.float64)
 	for l in xrange(2,lmax_+1):
-		out[0][l]=lcl_.tg(l)
-		out[3][l]=lcl_.tg(l)
-		out[1][l]=lcl_.gg(l)
-		out[2][l]=lcl_.cc(l)
-		
+		out[0][l]=lcl_.tt(l)-l*(l+1)*R*ucl[0][l]
+		out[1][l]=lcl_.gg(l)-(l**2+l-4)*R*ucl[1][l]
+		out[2][l]=lcl_.cc(l)-(l**2+l-4)*R*ucl[2][l]
+		out[3][l]=lcl_.tg(l)-(l**2+l-2)*R*ucl[3][l]
+		out[4][l]=lcl_.gc(l)-(l**2+l-4)*R*ucl[4][l]
+		out[5][l]=lcl_.tc(l)-(l**2+l-2)*R*ucl[5][l]
+
 	return out
