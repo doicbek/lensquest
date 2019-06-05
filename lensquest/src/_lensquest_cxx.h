@@ -1428,13 +1428,13 @@ void lensCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD) {
 					TBout+=F0[L][l2]*F2[L][l2]*clDD[L]*ulcl.tc(l2);
 					if ((l1+L+l2)%2!=0) {
 						EEout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
-						EBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
+						EBout+=-F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
 						BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gg(l2);
 					}
 					else{
 						EEout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gg(l2);
-						EBout+=-F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
-						// BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
+						EBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
+						BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
 					}
 				}
 			}
