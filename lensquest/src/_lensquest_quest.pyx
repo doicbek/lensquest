@@ -145,7 +145,6 @@ class quest:
 		
 	def make_minvariance(self,n0):
 		spectra=self.queststorage["grad"].keys()
-		assert set(spectra)<=set(n0.keys())
 		
 		nmv,weight=getweights(n0,spectra)
 		
