@@ -7,7 +7,7 @@
 #include <healpix_map.h>
 #include <alm.h>
 #include <alm_healpix_tools.h>
-#include <sharp_cxx.h>
+#include <libsharp/sharp_cxx.h>
 #include <fitshandle.h>
 
 using namespace std;

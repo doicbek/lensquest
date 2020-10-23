@@ -23,8 +23,9 @@ def cltype(cl):
 	else:
 		return 0
 							   
-cdef extern from "_lensquest_cxx.h":
+cdef extern from "_lensquest_cxx.cpp":
 	cdef void makeA(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB)
+	cdef void makeA_syst(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB, int type)
 	cdef vector[ vector[double] ] makeAN(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
 	cdef vector[ vector[double] ] computeKernel(string stype, PowSpec &wcl, PowSpec &dcl, int lminCMB, int L)
@@ -179,6 +180,107 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 		return al,nl
 	else: 
 		return al
+		
+
+def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None):
+	"""Computes the norm of the quadratic estimator.
+
+	Parameters
+	----------
+	wcl : array-like, shape (1,lmaxCMB) or (4, lmaxCMB)
+	  The input power spectra (lensed or unlensed) used in the weights of the normalization a la Okamoto & Hu, either TT only or TT, EE, BB and TE (polarization).
+	dcl : array-like, shape (1,lmaxCMB) or (4, lmaxCMB)
+	  The (noisy) input power spectra used in the denominators of the normalization (i.e. Wiener filtering), either TT only or TT, EE, BB and TE (polarization).
+	lmin : int, scalar, optional
+	  Minimum l of the normalization. Default: 2
+	lmax : int, scalar, optional
+	  Maximum l of the normalization. Default: lmaxCMB
+	lminCMB : int, scalar, optional
+	  Minimum l of the CMB power spectra. Default: 2
+	lmaxCMB : int, scalar, optional
+	  Maximum l of the CMB power spectra. Default: given by input cl arrays
+	bias: bool, scalar, optional
+	  Additionally computing the N0 bias. Default: False
+	
+	Returns
+	-------
+	AL: array or tuple of arrays
+	  Normalization for 1 (TT) or 5 (TT,TE,EE,TB,EB) quadratic estimators.
+	"""
+	
+	cdef int nspec, nspecout
+
+	nspec=cltype(wcl)
+	
+	if nspec!=cltype(dcl) or nspec<1: raise ValueError("The two power spectra arrays must be of same type and size")
+	if rdcl is not None:
+		if nspec!=cltype(rdcl): raise ValueError("The third power spectrum array must be of same type and size")
+	if nspec!=1 and nspec!=4: raise NotImplementedError("Power spectra must be given in an array of 1 (TT) or 4 (TT,EE,BB,TE) spectra")
+	 
+	cdef int lmin_, lmax_, lminCMB1_, lminCMB2_, lmaxCMB_, lmaxCMB1_, lmaxCMB2_, type_
+	lmin_=lmin
+	lminCMB1_=lminCMB
+	if lmaxCMB is None:
+		if nspec==1:
+			lmaxCMB=len(wcl)-1
+		else:
+			lmaxCMB=len(wcl[0])-1
+
+	lmaxCMB_=lmaxCMB
+	lmaxCMB1_=lmaxCMB
+		
+	if lmaxCMB2 is None:
+		lmaxCMB2_=lmaxCMB_
+	else:
+		lmaxCMB2_=lmaxCMB2
+		lmaxCMB_=np.max([lmaxCMB,lmaxCMB2])
+	
+	if lminCMB2 is None:
+		lminCMB2_=lminCMB1_
+	else:
+		lminCMB2_=lminCMB2
+		
+	
+	if lmax is None:
+		lmax_=lmaxCMB_
+	else:
+		lmax_=lmax
+        
+	type_=type
+		
+
+	wcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in wcl]
+	dcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in dcl]
+	if rdcl is not None: rdcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in rdcl]
+	nspec=4
+	
+
+	wcl_=ndarray2cl4(wcl_c[0], wcl_c[1], wcl_c[2], wcl_c[3], lmaxCMB_)
+	dcl_=ndarray2cl4(dcl_c[0], dcl_c[1], dcl_c[2], dcl_c[3], lmaxCMB_)
+	
+	nspecout=6
+
+	cdef PowSpec *al_=new PowSpec(nspecout,lmax_)
+
+	makeA_syst(wcl_[0], dcl_[0], al_[0], lmin_, lmax_, lminCMB1_, type_)
+	
+	del wcl_, dcl_
+		
+	al={}
+	al["TE"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["EE"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["TB"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["EB"] = np.zeros(lmax_+1, dtype=np.float64)
+	for l in xrange(lmin,lmax_+1):
+		al["TE"][l]=al_.tg(l)
+		al["EE"][l]=al_.gg(l)
+		al["TB"][l]=al_.tc(l)
+		al["EB"][l]=al_.gc(l)
+
+				
+	del al_
+		
+	return al
 		
 
 class quest_kernel:

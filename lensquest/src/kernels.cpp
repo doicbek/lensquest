@@ -48,7 +48,7 @@ void compF(vector<vector<double> >& F, int l1, int spin, int lmax_l2, int lmax_l
 	}
 }
 
-void compF_2(vector<vector<double> >& F, int l2, int spin, int lmax){
+void compF_phi(vector<vector<double> >& F, int l2, int spin, int lmax){
 
 	vector<double> wigner_output;
 	int wigner_lmax;
@@ -92,40 +92,8 @@ void compF_2(vector<vector<double> >& F, int l2, int spin, int lmax){
 	}
 }
 
-void compF_2_m(vector<vector<double> >& F, int l2, int M, int m1, int m2, int lmax){
 
-	vector<double> wigner_output;
-	int wigner_lmax;
-	int l1_max;
-	int l1_min;
-		
-	#pragma omp parallel private(l1_max, l1_min, wigner_lmax, wigner_output)       
-	{
-		#pragma omp for
-		for (int l3=0;l3<lmax;l3++){
-						
-			for (int l1=0;l1<lmax;l1++) {
-				F[l1][l3]=0.0;
-			}
-			
-			if (l3>=abs(m2)) {
-				wigner_output=WignerSymbols::wigner3j(l3,l2,m1,m2,-M);
-				
-				l1_min=max(abs(l2-l3),abs(m1));
-				l1_max=l2+l3;
-				
-				if (l1_max+1>=lmax) {wigner_lmax=lmax;}
-				else {wigner_lmax=l1_max+1;}
-				
-				for (int l1=l1_min;l1<wigner_lmax;l1++) {
-					F[l1][l3]=wigner_output[l1-l1_min]; 
-				}
-			} 
-		}
-	}
-}
-
-void compF_2_curl(vector<vector<double> >& F, int l2, int spin, int lmax){
+void compF_curl(vector<vector<double> >& F, int l2, int spin, int lmax){
 
 	vector<double> wigner_output_a;
 	vector<double> wigner_output_b;
@@ -183,6 +151,308 @@ void compF_2_curl(vector<vector<double> >& F, int l2, int spin, int lmax){
 		}
 	}
 }
+
+void compF_a(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)       
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,-2,2,0);
+				
+				l3_min=max(abs(l2-l1),2);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt(2.0*l3+1.0);
+			}
+		}
+	}
+}
+
+void compF_f(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)       
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,2,2,-4);
+				
+				l3_min=max(abs(l2-l1),2);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt(2.0*l3+1.0);
+			}
+		}
+	}
+}
+
+void compF_gamma(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)       
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,0,2,-2);
+				
+				l3_min=max(abs(l2-l1),0);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt(2.0*l3+1.0);
+			}
+		}
+	}
+}
+
+void compF_pa(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)       
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,-3,2,1);
+				
+				l3_min=max(abs(l2-l1),3);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3-2.0)*(l3+3.0)/2.0);
+			}
+		}
+	}
+}
+
+void compF_pb(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,1,-2,1);
+				
+				l3_min=max(abs(l2-l1),1);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3+2.0)*(l3-1.0)/2.0);
+			}
+		}
+	}
+}
+
+void compF_d(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,-1,2,-1);
+				
+				l3_min=max(abs(l2-l1),1);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*l3*(l3+1.0)/2.0);
+			}
+		}
+	}
+}
+
+void compF_q(vector<vector<double> >& F, int l2, int lmax){
+
+	vector<double> wigner_output;
+	int wigner_lmax;
+	int l3_max;
+	int l3_min;
+	
+	double sqt2l2=sqrt((2.0*l2+1.0)/4.0/M_PI);
+	
+	#pragma omp parallel private(l3_max, l3_min, wigner_lmax, wigner_output)
+	{
+		#pragma omp for
+		for (int l1=0;l1<lmax;l1++){
+			
+			double srt2l1=sqrt(2.0*l1+1.0);
+			
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]=0.0;
+			}
+			
+			if (l1>=2) {
+				wigner_output=WignerSymbols::wigner3j(l1,l2,-2,2,0);
+				
+				l3_min=max(abs(l2-l1),2);
+				l3_max=l2+l1;
+				
+				if (l3_max+1>=lmax) {wigner_lmax=lmax;}
+				else {wigner_lmax=l3_max+1;}
+				
+				for (int l3=l3_min;l3<wigner_lmax;l3++) {
+					F[l1][l3]=wigner_output[l3-l3_min]; 
+				}
+			} 
+
+			for (int l3=0;l3<lmax;l3++) {
+				F[l1][l3]*=sqt2l2;
+				F[l1][l3]*=srt2l1;
+				F[l1][l3]*=sqrt((2.0*l3+1.0))*(sqrt((l3-1.0)*l3*(l3+1.0)*(l3+2.0))-l3*(l3+1.0))/2.0;
+			}
+		}
+	}
+}
+
 
 
 void compF_2_noise(vector<vector<double> >& F, int l2, int spin, int lmax){
@@ -301,5 +571,37 @@ void compF_6j(vector<double>& F, int l2, int l3, int l4, int l5, int l6, int lma
 	}
 }
 
+// void compF_2_m(vector<vector<double> >& F, int l2, int M, int m1, int m2, int lmax){
+
+	// vector<double> wigner_output;
+	// int wigner_lmax;
+	// int l1_max;
+	// int l1_min;
+		
+	// #pragma omp parallel private(l1_max, l1_min, wigner_lmax, wigner_output)       
+	// {
+		// #pragma omp for
+		// for (int l3=0;l3<lmax;l3++){
+						
+			// for (int l1=0;l1<lmax;l1++) {
+				// F[l1][l3]=0.0;
+			// }
+			
+			// if (l3>=abs(m2)) {
+				// wigner_output=WignerSymbols::wigner3j(l3,l2,m1,m2,-M);
+				
+				// l1_min=max(abs(l2-l3),abs(m1));
+				// l1_max=l2+l3;
+				
+				// if (l1_max+1>=lmax) {wigner_lmax=lmax;}
+				// else {wigner_lmax=l1_max+1;}
+				
+				// for (int l1=l1_min;l1<wigner_lmax;l1++) {
+					// F[l1][l3]=wigner_output[l1-l1_min]; 
+				// }
+			// } 
+		// }
+	// }
+// }
 
 #endif /* KERNELS_CPP */

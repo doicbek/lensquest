@@ -6,12 +6,22 @@ import os
 
 nmpy_inc = get_include()
 
-if 'HEALPIX_CXX_DIR' in os.environ:
-	hpx_dir=os.environ['HEALPIX_CXX_DIR']
+if 'HEALPIX_CXX_INC_DIR' in os.environ:
+	hpx_inc_dir=os.environ['HEALPIX_CXX_INC_DIR']
 else:
-	print("Set HEALPIX_CXX_DIR environment variable (<path/to/healpix/installation>/src/cxx/generic_gcc/)")
+	print("Set HEALPIX_CXX_INC_DIR environment variable")
 
-LIBS=['healpix_cxx','cxxsupport','sharp','fftpack','c_utils']
+if 'SHARP_INC_DIR' in os.environ:
+	sharp_inc_dir=os.environ['SHARP_INC_DIR']
+else:
+	print("Set SHARP_INC_DIR environment variable")
+
+if 'HEALPIX_CXX_LIB_DIR' in os.environ:
+	hpx_lib_dir=os.environ['HEALPIX_CXX_LIB_DIR']
+else:
+	print("Set HEALPIX_CXX_LIB_DIR environment variable")
+
+LIBS=['healpix_cxx','sharp']#,'cxxsupport','sharp','fftpack','c_utils']
 OPTIONS=['-O3','-std=c++11','-fopenmp','-fPIC']
 
 setup(name='lensquest',
@@ -23,16 +33,16 @@ setup(name='lensquest',
 	ext_modules=cythonize([
 	Extension('lensquest._lensquest_norm',
 		sources=['lensquest/src/_lensquest_norm.pyx'],
-		include_dirs=[os.path.join(hpx_dir,"include"),nmpy_inc], 
-		library_dirs=[os.path.join(hpx_dir,"lib")],
+		include_dirs=[hpx_inc_dir,sharp_inc_dir,nmpy_inc], 
+		library_dirs=[hpx_lib_dir],
 		libraries=LIBS, #
 		extra_compile_args=OPTIONS,
 		extra_link_args=['-fopenmp'],
 		language='c++'),
 	Extension('lensquest._lensquest_quest',
 		sources=['lensquest/src/_lensquest_quest.pyx'],
-		include_dirs=[os.path.join(hpx_dir,"include"),nmpy_inc], 
-		library_dirs=[os.path.join(hpx_dir,"lib")],
+		include_dirs=[hpx_inc_dir,sharp_inc_dir,nmpy_inc], 
+		library_dirs=[hpx_lib_dir],
 		libraries=LIBS, #
 		extra_compile_args=OPTIONS,
 		extra_link_args=['-fopenmp'],
