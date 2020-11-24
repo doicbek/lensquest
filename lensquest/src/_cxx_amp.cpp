@@ -225,7 +225,7 @@ void ampEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]=map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map3[i]= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
 	}
 
 	almZ.Set(lmax_alm1, lmax_alm1);
@@ -250,7 +250,7 @@ void ampEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]+=map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map3[i]+= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
 	}
 
 	

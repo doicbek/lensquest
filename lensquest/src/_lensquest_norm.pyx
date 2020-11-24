@@ -30,6 +30,7 @@ cdef extern from "_lensquest_cxx.cpp":
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
 	cdef vector[ vector[double] ] computeKernel(string stype, PowSpec &wcl, PowSpec &dcl, int lminCMB, int L)
 	cdef void lensCls(PowSpec& llcl, PowSpec& ulcl,vector[double] &clDD) 
+	cdef void systCls(PowSpec& llcl, PowSpec& ulcl,vector[double] &clDD, int type) 
 	cdef vector[double] lensBB(vector[double] &clEE, vector[double] &clDD, int lmax_out, cbool even)
 
 def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None, bias=False):
@@ -496,5 +497,38 @@ def lenscls(ucl,clpp):
 		out[3][l]=lcl_.tg(l)-(l**2+l-2)*R*ucl[3][l]
 		out[4][l]=lcl_.gc(l)-(l**2+l-4)*R*ucl[4][l]
 		out[5][l]=lcl_.tc(l)-(l**2+l-2)*R*ucl[5][l]
+
+	return out
+	
+def systcls(type,ucl,clpp):
+	cdef int lmax_
+	
+	lmax_ul=len(ucl[0])-1
+	lmaxpp=len(clpp)-1
+
+	ucl_c = [np.ascontiguousarray(cl[:lmax_ul+1], dtype=np.float64) for cl in ucl]
+	if len(ucl_c)==4: ucl_=ndarray2cl4(ucl_c[0], ucl_c[1], ucl_c[2], ucl_c[3], lmax_ul)
+	else: raise NotImplementedError('Input spectra should be in an array of length 4: %d given'%len(ucl_c))
+		
+	cdef int type_
+    
+	type_=type
+    
+	cdef vector[double] clpp_ = vector[double](lmaxpp+1,0.)
+	for l in range(lmaxpp+1):
+		clpp_[l]=clpp[l]
+		
+	lmax_=lmax_ul
+	
+	cdef PowSpec *lcl_=new PowSpec(1,lmax_)
+	
+	systCls(lcl_[0], ucl_[0], clpp_, type_)
+	
+	l=np.arange(len(clpp))
+	R=.5*np.sum(l*(l+1)*(2*l+1)/4./np.pi*clpp)
+	
+	out=np.zeros(lmax_+1, dtype=np.float64)
+	for l in xrange(2,lmax_+1):
+		out[l]=lcl_.tt(l)-(l**2+l-4)*R*ucl[2][l]
 
 	return out

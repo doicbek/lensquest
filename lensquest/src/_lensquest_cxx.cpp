@@ -22,6 +22,10 @@
 #include "_cxx_healpix.cpp"
 #include "_cxx_lens.cpp"
 #include "_cxx_amp.cpp"
+#include "_cxx_rot.cpp"
+#include "_cxx_spinflip.cpp"
+#include "_cxx_monoleak.cpp"
+#include "_cxx_phodir.cpp"
 
 
 
@@ -65,8 +69,84 @@ void est_amp(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, s
 	}
 }
 
+void est_rot(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside) {
+	size_t lmax=almG.Lmax();
 
-void computef_systa(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+	Alm< xcomplex< double > > almC(lmax,lmax);
+	almG.SetToZero();
+	int type = string2esttype(stype);
+	
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+	
+	switch(type) {
+		case te: rotTE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case tb: rotTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case ee: rotEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case eb: rotEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+	}
+}
+
+void est_spinflip(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG,  Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside) {
+	size_t lmax=almG.Lmax();
+
+	almG.SetToZero();
+	almC.SetToZero();
+	int type = string2esttype(stype);
+	
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+	
+	switch(type) {
+		case te: spiTE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case tb: spiTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case ee: spiEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case eb: spiEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+	}
+}
+
+void est_monoleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG,  Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside) {
+	size_t lmax=almG.Lmax();
+
+	almG.SetToZero();
+	almC.SetToZero();
+	int type = string2esttype(stype);
+	
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+	
+	switch(type) {
+		case te: lmoTE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case tb: lmoTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case ee: lmoEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case eb: lmoEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+	}
+}
+
+void est_phodir(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG,  Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside) {
+	size_t lmax=almG.Lmax();
+
+	almG.SetToZero();
+	almC.SetToZero();
+	int type = string2esttype(stype);
+	
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+	
+	switch(type) {
+		case te: dirTE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case tb: dirTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case ee: dirEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case eb: dirEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+	}
+}
+
+
+void computef_systa(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -93,7 +173,7 @@ void computef_systa(std::vector< std::vector< std::vector<double> > >& f, size_t
 	}
 }
 
-void computef_systomega(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systomega(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -106,7 +186,7 @@ void computef_systomega(std::vector< std::vector< std::vector<double> > >& f, si
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
 				f[0][l1][l3]=-2*wcl.tg(l1)*F[l3][l1];
-				f[1][l1][l3]=-2*wcl.gg(l1)*F[l3][l1]-2*wcl.gg(l3)*F[l1][l3];
+				f[1][l1][l3]=-2*wcl.gg(l1)*F[l3][l1]+2*wcl.gg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
@@ -120,7 +200,7 @@ void computef_systomega(std::vector< std::vector< std::vector<double> > >& f, si
 	}
 }
 
-void computef_systfa(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systfa(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -147,7 +227,7 @@ void computef_systfa(std::vector< std::vector< std::vector<double> > >& f, size_
 	}
 }
 
-void computef_systfb(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systfb(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -160,7 +240,7 @@ void computef_systfb(std::vector< std::vector< std::vector<double> > >& f, size_
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
 				f[0][l1][l3]=-wcl.tg(l1)*F[l3][l1];
-				f[1][l1][l3]=-wcl.gg(l1)*F[l3][l1]-wcl.gg(l3)*F[l1][l3];
+				f[1][l1][l3]=-wcl.gg(l1)*F[l3][l1]+wcl.gg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
@@ -174,7 +254,7 @@ void computef_systfb(std::vector< std::vector< std::vector<double> > >& f, size_
 	}
 }
 
-void computef_systgammaa(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systgammaa(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -186,7 +266,7 @@ void computef_systgammaa(std::vector< std::vector< std::vector<double> > >& f, s
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2==0) {
-				f[0][l1][l3]=0;
+				f[0][l1][l3]=wcl.tt(l1)*F[l3][l1];
 				f[1][l1][l3]=wcl.tg(l1)*F[l3][l1]+wcl.tg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
@@ -201,7 +281,7 @@ void computef_systgammaa(std::vector< std::vector< std::vector<double> > >& f, s
 	}
 }
 
-void computef_systgammab(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systgammab(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -213,8 +293,8 @@ void computef_systgammab(std::vector< std::vector< std::vector<double> > >& f, s
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
-				f[0][l1][l3]=0;
-				f[1][l1][l3]=-wcl.tg(l1)*F[l3][l1]-wcl.tg(l3)*F[l1][l3];
+				f[0][l1][l3]=-wcl.tt(l1)*F[l3][l1];
+				f[1][l1][l3]=-wcl.tg(l1)*F[l3][l1]+wcl.tg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
@@ -228,7 +308,7 @@ void computef_systgammab(std::vector< std::vector< std::vector<double> > >& f, s
 	}
 }
 
-void computef_systpa(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systpa(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > Fa, Fb;
 	
@@ -241,15 +321,23 @@ void computef_systpa(std::vector< std::vector< std::vector<double> > >& f, size_
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]); 
-			f[1][l1][l3]=wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3])+wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1]); 
-			f[2][l1][l3]=-wcl.tg(l1)*(Fa[l3][l1]-Fb[l3][l1]);
-			f[3][l1][l3]=-wcl.gg(l1)*(Fa[l3][l1]-Fb[l3][l1])+wcl.cc(l3)*(Fa[l1][l3]-Fb[l1][l3]);
+			if ((l1+L+l3)%2!=0) {
+				f[0][l1][l3]=wcl.tg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+				f[1][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))+wcl.gg(l3)*((Fb[l1][l3]-Fa[l1][l3])+complex_i*(Fb[l1][l3]-Fa[l1][l3]));
+				f[2][l1][l3]=wcl.tg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
+				f[3][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]))-wcl.cc(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
+			}
+			else {
+				f[0][l1][l3]=wcl.tt(l1)*((Fa[l3][l1]+Fb[l3][l1])-complex_i*(Fa[l3][l1]+Fb[l3][l1])); 
+				f[1][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])-complex_i*(Fb[l3][l1]+Fa[l3][l1]))+wcl.gg(l3)*((Fb[l1][l3]+Fa[l1][l3])-complex_i*(Fb[l1][l3]+Fa[l1][l3]));
+				f[2][l1][l3]=wcl.tg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+				f[3][l1][l3]=wcl.gg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))-wcl.cc(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+			}
 		}
 	}
 }
 
-void computef_systpb(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systpb(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > Fa, Fb;
 	
@@ -262,15 +350,23 @@ void computef_systpb(std::vector< std::vector< std::vector<double> > >& f, size_
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=wcl.tg(l1)*(Fa[l3][l1]-Fb[l3][l1]); 
-			f[1][l1][l3]=wcl.gg(l3)*(Fa[l1][l3]-Fb[l1][l3])+wcl.gg(l1)*(Fa[l3][l1]-Fb[l3][l1]); 
-			f[2][l1][l3]=-wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]);
-			f[3][l1][l3]=-wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1])+wcl.cc(l3)*(Fa[l1][l3]+Fb[l1][l3]);
+			if ((l1+L+l3)%2!=0) {
+				f[0][l1][l3]=wcl.tg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+				f[1][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))+wcl.gg(l3)*((Fb[l1][l3]-Fa[l1][l3])+complex_i*(Fb[l1][l3]-Fa[l1][l3]));
+				f[2][l1][l3]=-wcl.tg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
+				f[3][l1][l3]=-wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]))+wcl.cc(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
+			}
+			else {
+				f[0][l1][l3]=-wcl.tt(l1)*((Fa[l3][l1]+Fb[l3][l1])-complex_i*(Fa[l3][l1]+Fb[l3][l1])); 
+				f[1][l1][l3]=-wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])-complex_i*(Fb[l3][l1]+Fa[l3][l1]))-wcl.gg(l3)*((Fb[l1][l3]+Fa[l1][l3])-complex_i*(Fb[l1][l3]+Fa[l1][l3]));
+				f[2][l1][l3]=wcl.tg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+				f[3][l1][l3]=wcl.gg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))-wcl.cc(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+			}
 		}
 	}
 }
 
-void computef_systda(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systda(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -289,7 +385,7 @@ void computef_systda(std::vector< std::vector< std::vector<double> > >& f, size_
 	}
 }
 
-void computef_systdb(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systdb(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -308,7 +404,7 @@ void computef_systdb(std::vector< std::vector< std::vector<double> > >& f, size_
 	}
 }
 
-void computef_systq(std::vector< std::vector< std::vector<double> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
+void computef_systq(std::vector< std::vector< std::vector<xcomplex< double >> > >& f, size_t L, PowSpec& wcl, size_t lminCMB, size_t lmaxCMB){
 	
 	std::vector< std::vector<double> > F;
 	
@@ -330,7 +426,7 @@ void computef_systq(std::vector< std::vector< std::vector<double> > >& f, size_t
 void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, int type) {
 	size_t lmaxCMB=dcl.Lmax();
 			
-	std::vector< std::vector< std::vector<double> > > f(4, std::vector< std::vector<double> >(lmaxCMB+1, std::vector<double>(lmaxCMB+1,0.0)));
+	std::vector< std::vector< std::vector<xcomplex< double >> > > f(4, std::vector< std::vector<xcomplex< double >> >(lmaxCMB+1, std::vector<xcomplex< double >>(lmaxCMB+1,0.0)));
 
 	std::vector<double> invlcltt(lmaxCMB+1,0.0), invlclee(lmaxCMB+1,0.0), invlclbb(lmaxCMB+1,0.0);
 	
@@ -364,10 +460,10 @@ void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lma
 			#pragma omp parallel for reduction(+:ate, aee, atb, aeb) schedule(dynamic, 25)
 			for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 				for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-					ate+=f[0][l1][l3]*f[0][l1][l3]*invlcltt[l1]*invlclee[l3];
-					aee+=f[1][l1][l3]*f[1][l1][l3]*invlclee[l1]*invlclee[l3]*.5;
-					atb+=f[2][l1][l3]*f[2][l1][l3]*invlcltt[l1]*invlclbb[l3]; 
-					aeb+=f[3][l1][l3]*f[3][l1][l3]*invlclee[l1]*invlclbb[l3];
+					ate+=real(f[0][l1][l3]*conj(f[0][l1][l3]))*invlcltt[l1]*invlclee[l3];
+					aee+=real(f[1][l1][l3]*conj(f[1][l1][l3]))*invlclee[l1]*invlclee[l3]*.5;
+					atb+=real(f[2][l1][l3]*conj(f[2][l1][l3]))*invlcltt[l1]*invlclbb[l3]; 
+					aeb+=real(f[3][l1][l3]*conj(f[3][l1][l3]))*invlclee[l1]*invlclbb[l3];
 				}
 			}
 		}
@@ -380,5 +476,125 @@ void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lma
 		if(PyErr_CheckSignals() == -1) {
 			throw invalid_argument( "Keyboard interrupt" );
 		}
+	}
+}
+
+void lensCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD) {
+	int lmax_ul=ulcl.Lmax();
+	int lmax_DD=clDD.size()-1;
+	int lmax_ll=llcl.Lmax();
+		
+	std::vector< std::vector<double> > F0(lmax_DD+1, std::vector<double>(lmax_ul+1,0.));
+	std::vector< std::vector<double> > F2(lmax_DD+1, std::vector<double>(lmax_ul+1,0.));
+	
+	for (size_t l1=0;l1<lmax_ll+1;l1++) {
+		if (l1>=2) {
+			compF(F0, l1, 0, lmax_DD+1, lmax_ul+1);
+			compF(F2, l1, 2, lmax_DD+1, lmax_ul+1);
+					
+			double TTout=0.;
+			double TEout=0.;
+			double TBout=0.;
+			double EEout=0.;
+			double EBout=0.;
+			double BBout=0.;
+			#pragma omp parallel for reduction(+:TTout,TEout,TBout,EEout,EBout,BBout)
+			for (size_t L=2;L<lmax_DD+1;L++) {
+				for (size_t l2=2;l2<lmax_ul+1;l2++) {
+					TTout+=F0[L][l2]*F0[L][l2]*clDD[L]*ulcl.tt(l2);
+					TEout+=F0[L][l2]*F2[L][l2]*clDD[L]*ulcl.tg(l2);
+					TBout+=F0[L][l2]*F2[L][l2]*clDD[L]*ulcl.tc(l2);
+					if ((l1+L+l2)%2!=0) {
+						EEout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
+						EBout+=-F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
+						BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gg(l2);
+					}
+					else{
+						EEout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gg(l2);
+						EBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.gc(l2);
+						BBout+=F2[L][l2]*F2[L][l2]*clDD[L]*ulcl.cc(l2);
+					}
+				}
+			}
+		
+			llcl.tt(l1)=TTout*1./(2.*l1+1.);
+			llcl.tg(l1)=TEout*1./(2.*l1+1.);
+			llcl.tc(l1)=TBout*1./(2.*l1+1.);
+			llcl.gg(l1)=EEout*1./(2.*l1+1.);
+			llcl.gc(l1)=EBout*1./(2.*l1+1.);
+			llcl.cc(l1)=BBout*1./(2.*l1+1.);
+		}
+						
+		if(PyErr_CheckSignals() == -1) {
+			throw invalid_argument( "Keyboard interrupt" );
+		}
+				
+	}
+}
+
+void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) {
+	int lmax_ul=ulcl.Lmax();
+	int lmax_DD=clDD.size()-1;
+	int lmax_ll=llcl.Lmax();
+	int lmax = max(lmax_ul,lmax_DD);
+		
+	std::vector< std::vector<double> > F(lmax+1, std::vector<double>(lmax+1,0.));
+	std::vector< std::vector<double> > Fa(lmax+1, std::vector<double>(lmax+1,0.));
+	
+	for (size_t l1=0;l1<lmax_ll+1;l1++) {
+		if (l1>=2) {
+			
+			if      (type==0) compF_a(F, l1, lmax+1);
+			else if (type==1) compF_a(F, l1, lmax+1);
+			else if (type==2) compF_f(F, l1, lmax+1);
+			else if (type==3) compF_f(F, l1, lmax+1);
+			else if (type==4) compF_gamma(F, l1, lmax+1);
+			else if (type==5) compF_gamma(F, l1, lmax+1);
+			else if (type==6){compF_pa(F, l1, lmax+1);compF_pb(Fa, l1, lmax+1);}
+			else if (type==7){compF_pa(F, l1, lmax+1);compF_pb(Fa, l1, lmax+1);}
+			else if (type==8) compF_d(F, l1, lmax+1);
+			else if (type==9) compF_d(F, l1, lmax+1);
+			else if (type==10)compF_q(F, l1, lmax+1);
+			
+			double BBout=0.;
+			#pragma omp parallel for reduction(+:BBout)
+			for (size_t L=2;L<lmax_DD+1;L++) {
+				for (size_t l2=2;l2<lmax_ul+1;l2++) {
+					if ((l1+L+l2)%2!=0) {
+						if      (type==0) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.gg(l2);
+						else if (type==1) BBout+=-2*F[L][l2]*F[L][l2]*clDD[L]*ulcl.cc(l2);
+						else if (type==2) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.gg(l2);
+						else if (type==3) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.cc(l2);
+						else if (type==4) BBout+=0;
+						else if (type==5) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+						else if (type==6) BBout+=+(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==7) BBout+=+(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==8) BBout+=0;
+						else if (type==9) BBout+=0;
+						else if (type==10)BBout+=0;
+					}
+					else{
+						if      (type==0) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.cc(l2);
+						else if (type==1) BBout+=2*F[L][l2]*F[L][l2]*clDD[L]*ulcl.gg(l2);
+						else if (type==2) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.cc(l2);
+						else if (type==3) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.gg(l2);
+						else if (type==4) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+						else if (type==5) BBout+=0;
+						else if (type==6) BBout+=-(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)-(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==7) BBout+=-(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)-(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==8) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+					    else if (type==9) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+					    else if (type==10)BBout+=0;
+					}
+				}
+			}
+		
+			llcl.tt(l1)=BBout*1./(2.*l1+1.);
+		}
+						
+		if(PyErr_CheckSignals() == -1) {
+			throw invalid_argument( "Keyboard interrupt" );
+		}
+				
 	}
 }
