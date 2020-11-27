@@ -322,16 +322,16 @@ void computef_systpa(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
-				f[0][l1][l3]=wcl.tg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
-				f[1][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))+wcl.gg(l3)*((Fb[l1][l3]-Fa[l1][l3])+complex_i*(Fb[l1][l3]-Fa[l1][l3]));
-				f[2][l1][l3]=wcl.tg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
-				f[3][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]))-wcl.cc(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
+				f[0][l1][l3]=-wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]+complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1]);
+				f[1][l1][l3]=-wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1]+complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1])+wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3]+complex_i*Fa[l1][l3]+complex_i*Fb[l1][l3]);
+				f[2][l1][l3]=-wcl.tg(l1)*(Fa[l3][l1]-Fb[l3][l1]+complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1]);
+				f[3][l1][l3]=-wcl.gg(l1)*(Fa[l3][l1]-Fb[l3][l1]+complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1])-wcl.cc(l3)*(Fa[l1][l3]-Fb[l1][l3]+complex_i*Fa[l1][l3]-complex_i*Fb[l1][l3]);
 			}
 			else {
-				f[0][l1][l3]=wcl.tt(l1)*((Fa[l3][l1]+Fb[l3][l1])-complex_i*(Fa[l3][l1]+Fb[l3][l1])); 
-				f[1][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])-complex_i*(Fb[l3][l1]+Fa[l3][l1]))+wcl.gg(l3)*((Fb[l1][l3]+Fa[l1][l3])-complex_i*(Fb[l1][l3]+Fa[l1][l3]));
-				f[2][l1][l3]=wcl.tg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
-				f[3][l1][l3]=wcl.gg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))-wcl.cc(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+				f[0][l1][l3]=-wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]-complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1]);
+				f[1][l1][l3]=-wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1]-complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1])-wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3]-complex_i*Fa[l1][l3]-complex_i*Fb[l1][l3]);
+				f[2][l1][l3]=wcl.tg(l1)*(Fa[l3][l1]-Fb[l3][l1]-complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1]);
+				f[3][l1][l3]=wcl.gg(l1)*(Fa[l3][l1]-Fb[l3][l1]-complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1])-wcl.cc(l3)*(Fa[l1][l3]-Fb[l1][l3]-complex_i*Fa[l1][l3]+complex_i*Fb[l1][l3]);
 			}
 		}
 	}
@@ -351,16 +351,16 @@ void computef_systpb(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
-				f[0][l1][l3]=wcl.tg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
-				f[1][l1][l3]=wcl.gg(l1)*((Fb[l3][l1]-Fa[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))+wcl.gg(l3)*((Fb[l1][l3]-Fa[l1][l3])+complex_i*(Fb[l1][l3]-Fa[l1][l3]));
-				f[2][l1][l3]=-wcl.tg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
-				f[3][l1][l3]=-wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]))+wcl.cc(l1)*((Fb[l3][l1]+Fa[l3][l1])+complex_i*(Fb[l3][l1]+Fa[l3][l1]));
+				f[0][l1][l3]=-wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]+complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1]);
+				f[1][l1][l3]=-wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1]+complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1])+wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3]+complex_i*Fa[l1][l3]+complex_i*Fb[l1][l3]);
+				f[2][l1][l3]=wcl.tg(l1)*(Fa[l3][l1]-Fb[l3][l1]+complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1]);
+				f[3][l1][l3]=wcl.gg(l1)*(Fa[l3][l1]-Fb[l3][l1]+complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1])+wcl.cc(l3)*(Fa[l1][l3]-Fb[l1][l3]+complex_i*Fa[l1][l3]-complex_i*Fb[l1][l3]);
 			}
 			else {
-				f[0][l1][l3]=-wcl.tt(l1)*((Fa[l3][l1]+Fb[l3][l1])-complex_i*(Fa[l3][l1]+Fb[l3][l1])); 
-				f[1][l1][l3]=-wcl.gg(l1)*((Fb[l3][l1]+Fa[l3][l1])-complex_i*(Fb[l3][l1]+Fa[l3][l1]))-wcl.gg(l3)*((Fb[l1][l3]+Fa[l1][l3])-complex_i*(Fb[l1][l3]+Fa[l1][l3]));
-				f[2][l1][l3]=wcl.tg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
-				f[3][l1][l3]=wcl.gg(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]))-wcl.cc(l1)*((Fa[l3][l1]-Fb[l3][l1])+complex_i*(Fb[l3][l1]-Fa[l3][l1]));
+				f[0][l1][l3]=wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]-complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1]);
+				f[1][l1][l3]=wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1]-complex_i*Fa[l3][l1]-complex_i*Fb[l3][l1])+wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3]-complex_i*Fa[l1][l3]-complex_i*Fb[l1][l3]);
+				f[2][l1][l3]=wcl.tg(l1)*(Fa[l3][l1]-Fb[l3][l1]-complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1]);
+				f[3][l1][l3]=wcl.gg(l1)*(Fa[l3][l1]-Fb[l3][l1]-complex_i*Fa[l3][l1]+complex_i*Fb[l3][l1])-wcl.cc(l3)*(Fa[l1][l3]-Fb[l1][l3]-complex_i*Fa[l1][l3]+complex_i*Fb[l1][l3]);
 			}
 		}
 	}
