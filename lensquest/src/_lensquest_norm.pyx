@@ -465,8 +465,8 @@ def lensbb(clee,clpp,lmax=None,even=False):
 		
 	return out
 	
-def lenscls(ucl,clpp,lmax=None):
-	cdef int lmax_, lmaxout_
+def lenscls(ucl,clpp):
+	cdef int lmax_
 	
 	lmax_ul=len(ucl[0])-1
 	lmaxpp=len(clpp)-1
@@ -481,10 +481,8 @@ def lenscls(ucl,clpp,lmax=None):
 		clpp_[l]=clpp[l]
 		
 	lmax_=lmax_ul
-	if lmax is None: lmaxout_=lmax_
-    else: lmaxout_=lmax
-    
-	cdef PowSpec *lcl_=new PowSpec(6,lmaxout_)
+	
+	cdef PowSpec *lcl_=new PowSpec(6,lmax_)
 	
 	lensCls(lcl_[0], ucl_[0], clpp_)
 	
@@ -502,8 +500,8 @@ def lenscls(ucl,clpp,lmax=None):
 
 	return out
 	
-def systcls(type,ucl,clpp,lmax=None):
-	cdef int lmax_, lmaxout_
+def systcls(type,ucl,clpp):
+	cdef int lmax_
 	
 	lmax_ul=len(ucl[0])-1
 	lmaxpp=len(clpp)-1
@@ -521,8 +519,6 @@ def systcls(type,ucl,clpp,lmax=None):
 		clpp_[l]=clpp[l]
 		
 	lmax_=lmax_ul
-	if lmax is None: lmaxout_=lmax_
-    else: lmaxout_=lmax
 	
 	cdef PowSpec *lcl_=new PowSpec(1,lmax_)
 	
