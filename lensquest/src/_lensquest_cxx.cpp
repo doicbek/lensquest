@@ -550,8 +550,8 @@ void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) 
 			else if (type==3) compF_f(F, l1, lmax+1);
 			else if (type==4) compF_gamma(F, l1, lmax+1);
 			else if (type==5) compF_gamma(F, l1, lmax+1);
-			else if (type==6){compF_pa(F, l1, lmax+1);compF_pb(Fa, l1, lmax+1);}
-			else if (type==7){compF_pa(F, l1, lmax+1);compF_pb(Fa, l1, lmax+1);}
+			else if (type==6){compF_pa(Fa, l1, lmax+1);compF_pb(F, l1, lmax+1);}
+			else if (type==7){compF_pa(Fa, l1, lmax+1);compF_pb(F, l1, lmax+1);}
 			else if (type==8) compF_d(F, l1, lmax+1);
 			else if (type==9) compF_d(F, l1, lmax+1);
 			else if (type==10)compF_q(F, l1, lmax+1);
@@ -567,8 +567,8 @@ void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) 
 						else if (type==3) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.cc(l2);
 						else if (type==4) BBout+=0;
 						else if (type==5) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
-						else if (type==6) BBout+=+(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.cc(l2);
-						else if (type==7) BBout+=+(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==6) BBout+=(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==7) BBout+=(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
 						else if (type==8) BBout+=0;
 						else if (type==9) BBout+=0;
 						else if (type==10)BBout+=0;
@@ -580,8 +580,8 @@ void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) 
 						else if (type==3) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.gg(l2);
 						else if (type==4) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 						else if (type==5) BBout+=0;
-						else if (type==6) BBout+=-(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)-(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
-						else if (type==7) BBout+=-(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)-(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==6) BBout+=-(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)-(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
+						else if (type==7) BBout+=-(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)-(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
 						else if (type==8) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 					    else if (type==9) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 					    else if (type==10)BBout+=0;
