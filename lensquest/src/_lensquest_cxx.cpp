@@ -377,10 +377,10 @@ void computef_systda(std::vector< std::vector< std::vector<xcomplex< double >> >
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=-.5*wcl.tt(l1)*F[l3][l1]*(1+complex_i*sgn(l1+L+l3));
-			f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1]*(-1-complex_i*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(-1-complex_i*sgn(l1+L+l3));
-			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+sgn(l1+L+l3));
-			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+sgn(l1+L+l3));
+			f[0][l1][l3]=-.5*wcl.tt(l1)*F[l3][l1]*(1.+1.*complex_i*1.*sgn(l1+L+l3));
+			f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1]*(-1.-1.*complex_i*1.*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(-1.-complex_i*1.*sgn(l1+L+l3));
+			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
+			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
 		}
 	}
 }
@@ -396,10 +396,10 @@ void computef_systdb(std::vector< std::vector< std::vector<xcomplex< double >> >
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+sgn(l1+L+l3));
-			f[1][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(complex_i+sgn(l1+L+l3));
-			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(1+complex_i*sgn(l1+L+l3));
-			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(1+complex_i*sgn(l1+L+l3));
+			f[0][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
+			f[1][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(complex_i+1.*sgn(l1+L+l3));
+			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(1.+complex_i*1.*sgn(l1+L+l3));
+			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(1.+complex_i*1.*sgn(l1+L+l3));
 		}
 	}
 }
@@ -569,8 +569,8 @@ void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) 
 						else if (type==5) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 						else if (type==6) BBout+=(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
 						else if (type==7) BBout+=(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2)+(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
-						else if (type==8) BBout+=0;
-						else if (type==9) BBout+=0;
+						else if (type==8) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+						else if (type==8) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 						else if (type==10)BBout+=0;
 					}
 					else{
