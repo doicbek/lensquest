@@ -567,10 +567,10 @@ void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) 
 						else if (type==3) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.cc(l2);
 						else if (type==4) BBout+=0;
 						else if (type==5) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
-						else if (type==6) BBout+=-(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2);
+						else if (type==6) BBout+=(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2);
 						else if (type==7) BBout+=(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
-						else if (type==8) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
-						else if (type==8) BBout+=-F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+						else if (type==8) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
+						else if (type==8) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 						else if (type==10)BBout+=0;
 					}
 					else{
@@ -581,7 +581,7 @@ void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type) 
 						else if (type==4) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 						else if (type==5) BBout+=0;
 						else if (type==6) BBout+=(Fa[L][l2]+F[L][l2])*(Fa[L][l2]+F[L][l2])*clDD[L]*ulcl.cc(l2);
-						else if (type==7) BBout+=-(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2);
+						else if (type==7) BBout+=(Fa[L][l2]-F[L][l2])*(Fa[L][l2]-F[L][l2])*clDD[L]*ulcl.gg(l2);
 						else if (type==8) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 					    else if (type==9) BBout+=F[L][l2]*F[L][l2]*clDD[L]*ulcl.tt(l2);
 					    else if (type==10)BBout+=0;
