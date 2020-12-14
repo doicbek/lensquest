@@ -529,6 +529,6 @@ def systcls(type,ucl,clpp):
 	
 	out=np.zeros(lmax_+1, dtype=np.float64)
 	for l in xrange(2,lmax_+1):
-		out[l]=lcl_.tt(l)-(l**2+l-4)*R*ucl[2][l]
+		out[l]=lcl_.tt(l)#-(l**2+l-4)*R*ucl[2][l]
 
 	return out

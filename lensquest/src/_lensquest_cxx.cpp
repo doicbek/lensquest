@@ -26,6 +26,7 @@
 #include "_cxx_spinflip.cpp"
 #include "_cxx_monoleak.cpp"
 #include "_cxx_phodir.cpp"
+#include "_cxx_dipleak.cpp"
 
 
 
@@ -142,6 +143,25 @@ void est_phodir(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2
 		case tb: dirTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
 		case ee: dirEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
 		case eb: dirEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+	}
+}
+
+void est_dipleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG,  Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside) {
+	size_t lmax=almG.Lmax();
+
+	almG.SetToZero();
+	almC.SetToZero();
+	int type = string2esttype(stype);
+	
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+	
+	switch(type) {
+		case te: ldiTE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case tb: ldiTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case ee: ldiEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case eb: ldiEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
 	}
 }
 
