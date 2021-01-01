@@ -302,7 +302,7 @@ void compF_pa(vector<vector<double> >& F, int l2, int lmax){
 			}
 			
 			if (l1>=2) {
-				wigner_output=WignerSymbols::wigner3j(l1,l2,-3,2,1);
+				wigner_output=WignerSymbols::wigner3j(l1,l2,3,-2,-1);
 				
 				l3_min=max(abs(l2-l1),3);
 				l3_max=l2+l1;
@@ -318,7 +318,7 @@ void compF_pa(vector<vector<double> >& F, int l2, int lmax){
 			for (int l3=0;l3<lmax;l3++) {
 				F[l1][l3]*=sqt2l2;
 				F[l1][l3]*=srt2l1;
-				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3-2.0)*(l3+3.0)/2.0);
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3-2.0)*(l3+3.0));
 			}
 		}
 	}
@@ -345,7 +345,7 @@ void compF_pb(vector<vector<double> >& F, int l2, int lmax){
 			}
 			
 			if (l1>=2) {
-				wigner_output=WignerSymbols::wigner3j(l1,l2,1,-2,1);
+				wigner_output=WignerSymbols::wigner3j(l1,l2,-1,2,-1);
 				
 				l3_min=max(abs(l2-l1),1);
 				l3_max=l2+l1;
@@ -361,7 +361,7 @@ void compF_pb(vector<vector<double> >& F, int l2, int lmax){
 			for (int l3=0;l3<lmax;l3++) {
 				F[l1][l3]*=sqt2l2;
 				F[l1][l3]*=srt2l1;
-				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3+2.0)*(l3-1.0)/2.0);
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3+2.0)*(l3-1.0));
 			}
 		}
 	}
@@ -447,7 +447,7 @@ void compF_q(vector<vector<double> >& F, int l2, int lmax){
 			for (int l3=0;l3<lmax;l3++) {
 				F[l1][l3]*=sqt2l2;
 				F[l1][l3]*=srt2l1;
-				F[l1][l3]*=sqrt((2.0*l3+1.0))*(sqrt((l3-1.0)*l3*(l3+1.0)*(l3+2.0))-l3*(l3+1.0))/2.0;
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*(l3-1.0)*l3*(l3+1.0)*(l3+2.0))/2.0;
 			}
 		}
 	}

@@ -27,6 +27,7 @@
 #include "_cxx_monoleak.cpp"
 #include "_cxx_phodir.cpp"
 #include "_cxx_dipleak.cpp"
+#include "_cxx_quadleak.cpp"
 
 
 
@@ -162,6 +163,25 @@ void est_dipleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm
 		case tb: ldiTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
 		case ee: ldiEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
 		case eb: ldiEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+	}
+}
+
+void est_quadleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG,  Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside) {
+	size_t lmax=almG.Lmax();
+
+	almG.SetToZero();
+	almC.SetToZero();
+	int type = string2esttype(stype);
+	
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+	
+	switch(type) {
+		case te: lquTE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case tb: lquTB(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case ee: lquEE(alm1, alm2, almG, almC, wcl, nside, weight); break;
+		case eb: lquEB(alm1, alm2, almG, almC, wcl, nside, weight); break;
 	}
 }
 
@@ -348,8 +368,8 @@ void computef_systpa(std::vector< std::vector< std::vector<xcomplex< double >> >
 				f[3][l1][l3]=.5*wcl.gg(l1)*(Fb[l3][l1]-Fa[l3][l1])+.5*wcl.cc(l3)*(Fb[l1][l3]-Fa[l1][l3]);
 			}
 			else {
-				f[0][l1][l3]=.5*complex_i*wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]);
-				f[1][l1][l3]=.5*complex_i*wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1])+.5*complex_i*wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3]);
+				f[0][l1][l3]=.5*wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]);
+				f[1][l1][l3]=.5*wcl.gg(l1)*(Fa[l3][l1]+Fb[l3][l1])+.5*wcl.gg(l3)*(Fa[l1][l3]+Fb[l1][l3]);
 				f[2][l1][l3]=0;
 				f[3][l1][l3]=0;
 			}
@@ -373,8 +393,8 @@ void computef_systpb(std::vector< std::vector< std::vector<xcomplex< double >> >
 			if ((l1+L+l3)%2==0) {
 				f[0][l1][l3]=0;
 				f[1][l1][l3]=0;
-				f[2][l1][l3]=.5*complex_i*wcl.tg(l1)*(Fb[l3][l1]-Fa[l3][l1]);
-				f[3][l1][l3]=.5*complex_i*wcl.gg(l1)*(Fb[l3][l1]-Fa[l3][l1])-.5*complex_i*wcl.cc(l3)*(Fb[l1][l3]-Fa[l1][l3]);
+				f[2][l1][l3]=.5*wcl.tg(l1)*(Fb[l3][l1]-Fa[l3][l1]);
+				f[3][l1][l3]=.5*wcl.gg(l1)*(Fb[l3][l1]-Fa[l3][l1])-.5*wcl.cc(l3)*(Fb[l1][l3]-Fa[l1][l3]);
 			}
 			else {
 				f[0][l1][l3]=-.5*wcl.tg(l1)*(Fa[l3][l1]+Fb[l3][l1]);
@@ -398,7 +418,7 @@ void computef_systda(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			f[0][l1][l3]=-.5*wcl.tt(l1)*F[l3][l1]*(1.+1.*complex_i*1.*sgn(l1+L+l3));
-			f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1]*(-1.-1.*complex_i*1.*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(-1.-complex_i*1.*sgn(l1+L+l3));
+			f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1]*(1.+1.*complex_i*1.*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(1.+1.*complex_i*1.*sgn(l1+L+l3));
 			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
 			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
 		}
@@ -417,7 +437,7 @@ void computef_systdb(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			f[0][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
-			f[1][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(complex_i+1.*sgn(l1+L+l3));
+			f[1][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3))+.5*wcl.tg(l3)*F[l1][l3]*(complex_i+1.*sgn(l1+L+l3));
 			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(1.+complex_i*1.*sgn(l1+L+l3));
 			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(1.+complex_i*1.*sgn(l1+L+l3));
 		}
@@ -435,10 +455,18 @@ void computef_systq(std::vector< std::vector< std::vector<xcomplex< double >> > 
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=0;
-			f[1][l1][l3]=wcl.tg(l1)*F[l3][l1]+sgn(l1+L+l3)*wcl.tg(l3)*F[l1][l3];
-			f[2][l1][l3]=sgn(l1+L+l3)*wcl.tt(l1)*F[l3][l1];
-			f[3][l1][l3]=sgn(l1+L+l3)*wcl.tg(l1)*F[l3][l1];
+			if ((l1+L+l3)%2!=0) {
+				f[0][l1][l3]=-wcl.tt(l1)*F[l3][l1];
+				f[1][l1][l3]=-wcl.tg(l1)*F[l3][l1]+wcl.tg(l3)*F[l1][l3];
+				f[2][l1][l3]=0.0; 
+				f[3][l1][l3]=0.0;
+			}
+			else {
+				f[0][l1][l3]=0.0; 
+				f[1][l1][l3]=0.0; 
+				f[2][l1][l3]=wcl.tt(l1)*F[l3][l1];
+				f[3][l1][l3]=wcl.tg(l1)*F[l3][l1];
+			}
 		}
 	}
 }

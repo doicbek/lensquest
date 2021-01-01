@@ -40,6 +40,7 @@ cdef extern from "_lensquest_cxx.cpp":
 	cdef void est_monoleak(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_phodir(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_dipleak(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
+	cdef void est_quadleak(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_mask(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almM, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_noise(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almN, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB, int nside)
 	cdef void btemp(Alm[xcomplex[double]] &almB, Alm[xcomplex[double]] &almE, Alm[xcomplex[double]] &almP, int lminB, int lminE, int lminP, int nside)
@@ -182,6 +183,16 @@ class quest:
 				self.queststorage["dipleak"]={}
 			self.almphotondir["dipleak"][type]=almdipleak
 		return almdipleak
+	
+	def quadleak(self,type,norm=None,store=False):
+		almquadleak=quest_quadleak(self.alms,self.wcl,self.dcl,type,self.nside,self.lmin,self.lmax,self.lminCMB,self.lmaxCMB,lminCMB2=self.lminCMB2,lmaxCMB2=self.lmaxCMB2,alms2=self.alms2)
+		if norm is not None:
+			almquadleak=almxfl(almquadleak,norm)
+		if store:
+			if "quadleak" not in self.queststorage.keys():
+				self.queststorage["quadleak"]={}
+			self.almphotondir["quadleak"][type]=almquadleak
+		return almquadleak
 	
 	def mask(self,type,norm=None,store=False):
 		almmask=quest_mask(self.alms,self.wcl,self.dcl,type,self.nside,self.lmin,self.lmax,self.lminCMB,self.lmaxCMB)
@@ -793,6 +804,85 @@ def quest_dipleak(alms, wcl, dcl, type, nside, lmin, lmax, lminCMB, lmaxCMB, lmi
 	del A, B, AP, AC, wcl_, dcl_
 	
 	return almP,almC
+					   
+def quest_quadleak(alms, wcl, dcl, type, nside, lmin, lmax, lminCMB, lmaxCMB, lminCMB2=None, lmaxCMB2=None, alms2=None):
+	"""Estimate phi from a set of 2 spinned alm
+	Parameters
+	---------- 
+	alms : list of 1, 2 or 3 arrays
+	  T only, Q and U or T,Q and U maps in one list
+	wcl : array-like, shape (1,lmaxCMB) or (4, lmaxCMB)
+	  The input power spectra (lensed or unlensed) used in the weights of the normalization a la Okamoto & Hu, either TT only or TT, EE, BB and TE (polarization).
+	dcl : array-like, shape (1,lmaxCMB) or (4, lmaxCMB)
+	  The (noisy) input power spectra used in the denominators of the normalization (i.e. Wiener filtering), either TT only or TT, EE, BB and TE (polarization).
+	type : string
+		TT, TE, EE, TB, EB or BB
+	lmin : int, scalar, optional
+	  Minimum l of the normalization. Default: 2
+	lmax : int, scalar, optional
+	  Maximum l of the normalization. Default: lmaxCMB
+	lminCMB : int, scalar, optional
+	  Minimum l of the CMB power spectra. Default: 2
+	lmaxCMB : int, scalar, optional
+	  Maximum l of the CMB power spectra. Default: given by input cl arrays
+		  
+	Returns
+	-------
+	almP : array
+		array containing the estimated lensing potential in harmonic space, unnormalized
+	"""
+	
+	nspec=cltype(wcl)
+	cdef int lmin_, lmax_, lminCMB_, lmaxCMB_,lminCMB1_, lmaxCMB1_,lminCMB2_, lmaxCMB2_, nside_
+	cdef string type_
+	type_=type.encode()
+	
+	lmin_=lmin
+	lminCMB1_=lminCMB
+	lminCMB2_=lminCMB2
+	
+	lmax_=lmax	
+	lmaxCMB1_=lmaxCMB
+	lmaxCMB2_=lmaxCMB2
+	
+	lmaxCMB_=np.max([lmaxCMB,lmaxCMB2])
+	
+	nside_=nside
+		
+	if nspec==1:
+		wcl_c = np.ascontiguousarray(wcl[:lmaxCMB_+1], dtype=np.float64)
+		dcl_c = np.ascontiguousarray(dcl[:lmaxCMB_+1], dtype=np.float64)
+	elif nspec==4:
+		wcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in wcl]
+		dcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in dcl]
+
+	if nspec==1:
+		wcl_=ndarray2cl1(wcl_c, lmaxCMB_)
+		dcl_=ndarray2cl1(dcl_c, lmaxCMB_)
+	elif nspec==4:
+		wcl_=ndarray2cl4(wcl_c[0], wcl_c[1], wcl_c[2], wcl_c[3], lmaxCMB_)
+		dcl_=ndarray2cl4(dcl_c[0], dcl_c[1], dcl_c[2], dcl_c[3], lmaxCMB_)
+
+	alms_cA = np.ascontiguousarray(alms[t2i(type[0])], dtype=np.complex128)
+	if alms2 is None:
+		alms_cB = np.ascontiguousarray(alms[t2i(type[1])], dtype=np.complex128)
+	else:
+		alms_cB = np.ascontiguousarray(alms2[t2i(type[1])], dtype=np.complex128)
+
+	A = ndarray2alm(alms_cA, lmaxCMB_, lmaxCMB_)
+	B = ndarray2alm(alms_cB, lmaxCMB_, lmaxCMB_)
+
+	n_alm = alm_getn(lmax_, lmax_)
+	almP = np.empty(n_alm, dtype=np.complex128)
+	almC = np.empty(n_alm, dtype=np.complex128)
+	AP = ndarray2alm(almP, lmax_, lmax_)
+	AC = ndarray2alm(almC, lmax_, lmax_)
+
+	est_quadleak(A[0], B[0], type_, AP[0], AC[0], wcl_[0], dcl_[0], lmin_, lminCMB1_, lminCMB2_, lmaxCMB1_, lmaxCMB2_, nside_)
+
+	del A, B, AP, AC, wcl_, dcl_
+	
+	return almP
 			
 		
 def quest_curl(alms, wcl, dcl, type, nside, lmin, lmax, lminCMB, lmaxCMB):
