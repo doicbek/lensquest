@@ -88,8 +88,8 @@ void lmoTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
 		tempdouble=map1Q[i];
-		map1Q[i]=-map2Q[i]*map1Q[i];
-		map1U[i]=-map2U[i]*tempdouble;
+		map1Q[i]=map2Q[i]*map1Q[i];
+		map1U[i]=map2U[i]*tempdouble;
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -223,8 +223,8 @@ void lmoEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
 		tempdouble=map1Q[i];
-		map1Q[i]=-map2Q[i]*map1Q[i] ;
-		map1U[i]=-map2U[i]*tempdouble;
+		map1Q[i]=map2Q[i]*map1Q[i] ;
+		map1U[i]=map2U[i]*tempdouble;
 	}
 
 	almC.Set(lmax_almG, lmax_almG);

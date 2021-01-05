@@ -42,6 +42,7 @@ cdef extern from "_lensquest_cxx.cpp":
 	cdef void est_dipleak(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_quadleak(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_mask(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almM, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
+	cdef void map2alm_spin_iter(Healpix_Map[double] &mapQ, Healpix_Map[double] &mapU, Alm[xcomplex[double]] &almG, Alm[xcomplex[double]] &almC, int spin, int num_iter);
 	cdef void est_noise(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almN, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB, int nside)
 	cdef void btemp(Alm[xcomplex[double]] &almB, Alm[xcomplex[double]] &almE, Alm[xcomplex[double]] &almP, int lminB, int lminE, int lminP, int nside)
 	
@@ -1115,7 +1116,7 @@ cdef int alm_getn(int l, int m):
 	return ((m+1)*(m+2))/2 + (m+1)*(l-m)
 	
 	
-def map2palm(maps, mask, binmask = None, lmax = None, mmax = None, pureE = True):
+def map2alm(maps, mask, binmask = None, lmax = None, mmax = None, niter = 3, spin = 2):
 	"""Computes the spinned alm of a 2 Healpix maps.
 	Parameters
 	----------
@@ -1131,21 +1132,12 @@ def map2palm(maps, mask, binmask = None, lmax = None, mmax = None, pureE = True)
 	pure alms : list of 3 arrays
 	"""
 	
-	if binmask is None:
-		binmask=np.zeros_like(mask)
-		binmask[mask!=0]=1
-	
 	maps_c = [np.ascontiguousarray(m, dtype=np.float64) for m in maps]
-	mask_c = np.ascontiguousarray(mask, dtype=np.float64)
-	binmask_c = np.ascontiguousarray(binmask, dtype=np.float64)
 
 
 	# Adjust lmax and mmax
 	cdef int lmax_, mmax_, nside, npix
-	cdef cbool pureE_
-	
-	pureE_=pureE
-	
+		
 	npix = maps_c[0].size
 	nside = npix2nside(npix)
 	if lmax is None:
@@ -1160,15 +1152,10 @@ def map2palm(maps, mask, binmask = None, lmax = None, mmax = None, pureE = True)
 	# Check all maps have same npix
 	if maps_c[1].size != npix:
 		raise ValueError("Input maps must have same size")	  
-	if maps_c[2].size != npix:
-		raise ValueError("Input maps must have same size")
 	
 	# View the ndarray as a Healpix_Map
 	M1 = ndarray2map(maps_c[0], RING)
 	M2 = ndarray2map(maps_c[1], RING)
-	M3 = ndarray2map(maps_c[2], RING)
-	MA = ndarray2map(mask_c, RING)
-	BMA = ndarray2map(binmask_c, RING)
 
 	# Create an ndarray object that will contain the alm for output (to be returned)
 	n_alm = alm_getn(lmax_, mmax_)
@@ -1178,16 +1165,8 @@ def map2palm(maps, mask, binmask = None, lmax = None, mmax = None, pureE = True)
 	# Alms = [ndarray2alm(alm, lmax_, mmax_) for alm in alms]
 	A1 = ndarray2alm(alms[0], lmax_, mmax_) 
 	A2 = ndarray2alm(alms[1], lmax_, mmax_) 
-	A3 = ndarray2alm(alms[2], lmax_, mmax_) 
 	
-	# ring weights
-	cdef arr[double] * w_arr = new arr[double]()
-	cdef int i
-	cdef char *c_datapath
-	w_arr.allocAndFill(2 * nside, 1.)
-	
-	map2purealm(M1[0], M2[0], M3[0], MA[0], BMA[0], A1[0], A2[0], A3[0], w_arr[0], pureE_)
+	map2alm_spin_iter(M1[0], M2[0], A1[0], A2[0], spin, niter)
 
-	del w_arr
-	del M1, M2, M3, MA, BMA, A1, A2, A3
+	del M1, M2, A1, A2
 	return alms

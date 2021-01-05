@@ -45,8 +45,8 @@ void spiTE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
 		tempdouble=map1Q[i];
-		map1Q[i]=map2Q[i]*tempdouble - map2U[i]*map1U[i];
-		map1U[i]=-map2U[i]*tempdouble - map2Q[i]*map1U[i];
+		map1Q[i]=-map2Q[i]*tempdouble + map2U[i]*map1U[i];
+		map1U[i]=map2U[i]*tempdouble + map2Q[i]*map1U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -100,8 +100,8 @@ void spiTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
 		tempdouble=map1Q[i];
-		map1Q[i]=map2Q[i]*tempdouble - map2U[i]*map1U[i];
-		map1U[i]=-map2U[i]*tempdouble - map2Q[i]*map1U[i];
+		map1Q[i]=-map2Q[i]*tempdouble + map2U[i]*map1U[i];
+		map1U[i]=map2U[i]*tempdouble + map2Q[i]*map1U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -156,8 +156,8 @@ void spiEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]=map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
-		map4[i]=-map2U[i]*map1Q[i] - map2Q[i]*map1U[i];
+		map3[i]= - map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map4[i]=   map2U[i]*map1Q[i] + map2Q[i]*map1U[i];
 	}
 
 	almZ.Set(lmax_alm1, lmax_alm1);
@@ -183,8 +183,8 @@ void spiEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
 		tempdouble=map1Q[i];
-		map1Q[i]=map3[i]+map2Q[i]*tempdouble - map2U[i]*map1U[i];
-		map1U[i]=map4[i]-map2U[i]*tempdouble - map2Q[i]*map1U[i];
+		map1Q[i]=map3[i] - map2Q[i]*tempdouble + map2U[i]*map1U[i];
+		map1U[i]=map4[i] + map2U[i]*tempdouble + map2Q[i]*map1U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -242,8 +242,8 @@ void spiEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]=map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
-		map4[i]=-map2U[i]*map1Q[i] - map2Q[i]*map1U[i];
+		map3[i]= - map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map4[i]= + map2U[i]*map1Q[i] + map2Q[i]*map1U[i];
 	}
 
 	almZ.Set(lmax_alm1, lmax_alm1);
@@ -269,8 +269,8 @@ void spiEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
 		tempdouble=map1Q[i];
-		map1Q[i]=map3[i]+map2Q[i]*tempdouble - map2U[i]*map1U[i];
-		map1U[i]=map4[i]-map2U[i]*tempdouble - map2Q[i]*map1U[i];
+		map1Q[i]=map3[i] - map2Q[i]*tempdouble + map2U[i]*map1U[i];
+		map1U[i]=map4[i] + map2U[i]*tempdouble + map2Q[i]*map1U[i];
 	}
 
 	almG.Set(lmax_almG, lmax_almG);

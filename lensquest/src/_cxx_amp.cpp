@@ -93,7 +93,7 @@ void ampTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map1Q[i]= - map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
+		map1Q[i]= map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);

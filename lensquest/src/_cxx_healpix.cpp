@@ -18,6 +18,20 @@ void map2alm_spin_iter(sharp_cxxjob<double> &job, Healpix_Map<double> &mapQ, Hea
 	}
 }
 
+void map2alm_spin_iter(Healpix_Map<double> &mapQ, Healpix_Map<double> &mapU, Alm<xcomplex<double> > &almG, Alm<xcomplex<double> > &almC, int spin, int num_iter) {
+	size_t lmax_almG=almG.Lmax();
+	int nside = mapQ.Nside();
+
+	arr<double> weight;
+	weight.alloc(2*nside);
+	weight.fill(1.0);
+    sharp_cxxjob<double> job;
+	job.set_weighted_Healpix_geometry (nside, &weight[0]);
+	job.set_triangular_alm_info (lmax_almG, lmax_almG);	
+	
+	map2alm_spin_iter(job, mapQ, mapU, almG, almC, spin, num_iter);
+}
+
 void alm2map_spin(sharp_cxxjob<double> &job,  Alm<xcomplex<double> > &almG, Alm<xcomplex<double> > &almC, Healpix_Map<double> &mapQ, Healpix_Map<double> &mapU, int spin) {
 	size_t lmax=almG.Lmax();
 	job.set_triangular_alm_info (lmax, lmax);	
