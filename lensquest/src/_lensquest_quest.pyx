@@ -1116,7 +1116,7 @@ cdef int alm_getn(int l, int m):
 	return ((m+1)*(m+2))/2 + (m+1)*(l-m)
 	
 	
-def map2alm(maps, mask, binmask = None, lmax = None, mmax = None, niter = 3, spin = 2):
+def map2alm(maps, lmax = None, mmax = None, niter = 3, spin = 2):
 	"""Computes the spinned alm of a 2 Healpix maps.
 	Parameters
 	----------
