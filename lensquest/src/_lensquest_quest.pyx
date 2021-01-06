@@ -7,7 +7,7 @@ from libc.math cimport sqrt, floor, fabs
 cimport libc
 import os
 import cython
-from healpy import map2alm, npix2nside, almxfl
+from healpy import map2alm, npix2nside, almxfl, nside2npix
 from healpy.pixelfunc import maptype, get_min_valid_nside
 from healpy.sphtfunc import Alm as almpy
 from libcpp cimport bool as cbool
@@ -43,11 +43,9 @@ cdef extern from "_lensquest_cxx.cpp":
 	cdef void est_quadleak(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almP, Alm[xcomplex[double]] &almC, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void est_mask(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almM, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2, int nside)
 	cdef void map2alm_spin_iter(Healpix_Map[double] &mapQ, Healpix_Map[double] &mapU, Alm[xcomplex[double]] &almG, Alm[xcomplex[double]] &almC, int spin, int num_iter);
+	cdef void alm2map_spin(Alm[xcomplex[double]] &almG, Alm[xcomplex[double]] &almC, Healpix_Map[double] &mapQ, Healpix_Map[double] &mapU, int spin);
 	cdef void est_noise(Alm[xcomplex[double]] &alm1, Alm[xcomplex[double]] &alm2, string stype, Alm[xcomplex[double]] &almN, PowSpec &wcl, PowSpec &dcl, int lmin, int lminCMB, int nside)
 	cdef void btemp(Alm[xcomplex[double]] &almB, Alm[xcomplex[double]] &almE, Alm[xcomplex[double]] &almP, int lminB, int lminE, int lminP, int nside)
-	
-cdef extern from "map2purealm.cpp":
-	cdef void map2purealm(Healpix_Map[double] &mapT, Healpix_Map[double] &mapQ, Healpix_Map[double] &mapU, Healpix_Map[double] &W0, Healpix_Map[double] &mask, Alm[xcomplex[double]] &almT, Alm[xcomplex[double]] &almG, Alm[xcomplex[double]] &almC, arr[double] &weight, cbool pureE)
 
 class quest:
 	def __init__(self, maps, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, map2=None, nside=None):
@@ -1116,7 +1114,7 @@ cdef int alm_getn(int l, int m):
 	return ((m+1)*(m+2))/2 + (m+1)*(l-m)
 	
 	
-def map2alm(maps, lmax = None, mmax = None, niter = 3, spin = 2):
+def lqmap2alm(maps, lmax = None, mmax = None, niter = 3, spin = 2):
 	"""Computes the spinned alm of a 2 Healpix maps.
 	Parameters
 	----------
@@ -1170,3 +1168,46 @@ def map2alm(maps, lmax = None, mmax = None, niter = 3, spin = 2):
 
 	del M1, M2, A1, A2
 	return alms
+    
+def lqalm2map(alms, nside, spin = 2):
+	"""Computes the spinned alm of a 2 Healpix maps.
+	Parameters
+	----------
+	m : list of 3 arrays
+	mask : array containing apodized mask 
+	lmax : int, scalar, optional
+	  Maximum l of the power spectrum. Default: 3*nside-1
+	mmax : int, scalar, optional
+	  Maximum m of the alm. Default: lmax
+	
+	Returns
+	-------
+	pure alms : list of 3 arrays
+	"""
+	
+	alms_cA = np.ascontiguousarray(alms[0], dtype=np.complex128)
+	alms_cB = np.ascontiguousarray(alms[1], dtype=np.complex128)
+
+	# Adjust lmax and mmax	
+	lmax_ = almpy.getlmax(alms_cA.size)
+	mmax_ = lmax_
+
+	# Check all maps have same npix
+	if alms_cB.size != alms_cA.size:
+		raise ValueError("Input alms must have same size")	  
+	
+	# View the ndarray as a Healpix_Map
+	maps = [np.empty(nside2npix(nside), dtype=np.float64) for m in alms]
+    
+	M1 = ndarray2map(maps[0], RING)
+	M2 = ndarray2map(maps[1], RING)
+
+	# View the ndarray as an Alm
+	# Alms = [ndarray2alm(alm, lmax_, mmax_) for alm in alms]
+	A1 = ndarray2alm(alms_cA, lmax_, mmax_) 
+	A2 = ndarray2alm(alms_cB, lmax_, mmax_) 
+	
+	alm2map_spin(A1[0], A2[0], M1[0], M2[0], spin)
+
+	del M1, M2, A1, A2
+	return maps
