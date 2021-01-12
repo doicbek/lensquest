@@ -417,10 +417,18 @@ void computef_systda(std::vector< std::vector< std::vector<xcomplex< double >> >
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=-.5*wcl.tt(l1)*F[l3][l1]*(1.+1.*complex_i*1.*sgn(l1+L+l3));
-			f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1]*(1.+1.*complex_i*1.*sgn(l1+L+l3))-.5*wcl.tg(l3)*F[l1][l3]*(1.+1.*complex_i*1.*sgn(l1+L+l3));
-			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
-			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
+			if ((l1+L+l3)%2==0) {
+				f[0][l1][l3]=0;
+				f[1][l1][l3]=0;
+				f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1];
+				f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1];
+			}
+			else {
+				f[0][l1][l3]=-.5*wcl.tt(l1)*F[l3][l1];
+				f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1];
+				f[2][l1][l3]=0;
+				f[3][l1][l3]=0;
+			}
 		}
 	}
 }
@@ -436,10 +444,18 @@ void computef_systdb(std::vector< std::vector< std::vector<xcomplex< double >> >
 	#pragma omp parallel for
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
-			f[0][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3));
-			f[1][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(complex_i+1.*sgn(l1+L+l3))+.5*wcl.tg(l3)*F[l1][l3]*(complex_i+1.*sgn(l1+L+l3));
-			f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1]*(1.+complex_i*1.*sgn(l1+L+l3));
-			f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1]*(1.+complex_i*1.*sgn(l1+L+l3));
+			if ((l1+L+l3)%2!=0) {
+				f[0][l1][l3]=0;
+				f[1][l1][l3]=0;
+				f[2][l1][l3]=.5*wcl.tt(l1)*F[l3][l1];
+				f[3][l1][l3]=.5*wcl.tg(l1)*F[l3][l1];
+			}
+			else {
+				f[0][l1][l3]=-.5*wcl.tt(l1)*F[l3][l1];
+				f[1][l1][l3]=-.5*wcl.tg(l1)*F[l3][l1];
+				f[2][l1][l3]=0;
+				f[3][l1][l3]=0;
+			}
 		}
 	}
 }

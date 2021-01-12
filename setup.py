@@ -48,6 +48,6 @@ setup(name='lensquest',
 		extra_link_args=['-fopenmp'],
 		language='c++')
 	]),
-	install_requires=['numpy', 'healpy'],
+	#install_requires=['numpy', 'healpy'],
 	license='GPLv2'
 )

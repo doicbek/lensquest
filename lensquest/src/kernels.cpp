@@ -404,7 +404,7 @@ void compF_d(vector<vector<double> >& F, int l2, int lmax){
 			for (int l3=0;l3<lmax;l3++) {
 				F[l1][l3]*=sqt2l2;
 				F[l1][l3]*=srt2l1;
-				F[l1][l3]*=sqrt((2.0*l3+1.0)*l3*(l3+1.0)/2.0);
+				F[l1][l3]*=sqrt((2.0*l3+1.0)*l3*(l3+1.0));
 			}
 		}
 	}
