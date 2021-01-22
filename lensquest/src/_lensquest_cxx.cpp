@@ -487,6 +487,75 @@ void computef_systq(std::vector< std::vector< std::vector<xcomplex< double >> > 
 	}
 }
 
+
+std::vector< std::vector< std::vector< std::vector<double> > > > makeAN_syst(PowSpec& wcl, PowSpec& dcl, size_t lmin, size_t lmax, size_t lminCMB1, size_t lminCMB2, size_t lmaxCMB1, size_t lmaxCMB2) {
+	int num_spec=4;
+	int num_syst=11;
+
+	assert(wcl.Num_specs()==4);
+	
+	size_t lmaxCMB=max(lmaxCMB1,lmaxCMB2);
+	size_t lminCMB=min(lminCMB1,lminCMB2);
+
+	std::vector< std::vector< std::vector< std::vector<double> > > > bias(lmax+1, std::vector<std::vector<std::vector<double>>>(num_syst ,std::vector<std::vector<double>>(num_syst,  std::vector<double>(num_spec,0.0))));
+	std::vector< std::vector< std::vector< std::vector<xcomplex< double >> > > > f(num_syst,  std::vector< std::vector< std::vector<xcomplex< double >> > >(4, std::vector< std::vector<xcomplex< double >> >(lmaxCMB+1, std::vector<xcomplex< double >>(lmaxCMB+1,0.0))));
+
+	
+	std::vector<double> invlcltt(lmaxCMB+1,0.0), invlclee(lmaxCMB+1,0.0), invlclbb(lmaxCMB+1,0.0);
+	
+	#pragma omp parallel for
+	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
+		invlcltt[l1]=1./dcl.tt(l1);
+		invlclee[l1]=1./dcl.gg(l1);
+		invlclbb[l1]=1./dcl.cc(l1);
+	}
+	
+	double ate, aee, atb, aeb;
+		
+	
+	for (size_t L=lmin;L<lmax+1;L++) {
+		
+		computef_systa(f[syst_a],L,wcl,lminCMB,lmaxCMB);
+		computef_systomega(f[syst_o],L,wcl,lminCMB,lmaxCMB);
+		computef_systfa(f[syst_f1],L,wcl,lminCMB,lmaxCMB);
+		computef_systfb(f[syst_f2],L,wcl,lminCMB,lmaxCMB);
+		computef_systgammaa(f[syst_g1],L,wcl,lminCMB,lmaxCMB);
+		computef_systgammab(f[syst_g2],L,wcl,lminCMB,lmaxCMB);
+		computef_systpa(f[syst_p1],L,wcl,lminCMB,lmaxCMB);
+		computef_systpb(f[syst_p2],L,wcl,lminCMB,lmaxCMB);
+		computef_systda(f[syst_d1],L,wcl,lminCMB,lmaxCMB);
+		computef_systdb(f[syst_d2],L,wcl,lminCMB,lmaxCMB);
+		computef_systq(f[syst_q],L,wcl,lminCMB,lmaxCMB);
+				
+		if (L>=lmin) {
+			for (int s1=0;s1<num_syst;s1++) {
+				for (int s2=0;s2<s1+1;s2++) {
+					ate=0.; aee=0.; atb=0.; aeb=0.;
+					#pragma omp parallel for reduction(+:ate, aee, atb, aeb) schedule(dynamic, 25)
+					for (size_t l1=lminCMB1;l1<lmaxCMB1+1;l1++) {
+						for (size_t l3=lminCMB2;l3<lmaxCMB2+1;l3++) {
+							ate+=real(f[s1][0][l1][l3]*conj(f[s2][0][l1][l3]))*invlcltt[l1]*invlclee[l3];
+							aee+=real(f[s1][1][l1][l3]*conj(f[s2][1][l1][l3]))*invlclee[l1]*invlclee[l3]*.5;
+							atb+=real(f[s1][2][l1][l3]*conj(f[s2][2][l1][l3]))*invlcltt[l1]*invlclbb[l3]; 
+							aeb+=real(f[s1][3][l1][l3]*conj(f[s2][3][l1][l3]))*invlclee[l1]*invlclbb[l3];
+						}
+					}
+				
+					bias[L][s1][s2][0] = (ate!=0.) ? (2.0*L+1.0)/ate : 0.0;
+					bias[L][s1][s2][1] = (aee!=0.) ? (2.0*L+1.0)/aee : 0.0;
+					bias[L][s1][s2][2] = (atb!=0.) ? (2.0*L+1.0)/atb : 0.0;
+					bias[L][s1][s2][3] = (aeb!=0.) ? (2.0*L+1.0)/aeb : 0.0;
+				}
+			}
+		}
+
+		PyErr_CheckSignals();
+	}
+	
+	return bias;
+}
+
+
 void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, int type) {
 	size_t lmaxCMB=dcl.Lmax();
 			

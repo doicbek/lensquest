@@ -5,6 +5,7 @@ enum spectra {tt, te, ee, tb, eb, bb};
 enum crosses {tttt, ttte, ttee, tete, teee, eeee, tbtb, tbeb, ebeb};
 enum bh_type {grad, mask, nois, NUM_BH_TYPE};
 enum bh_type_cross {gradgrad, gradmask, gradnois, maskmask, masknois, noisnois, NUM_BH_TYPE_CROSS};
+enum syst_type {syst_a, syst_o, syst_g1, syst_g2, syst_f1, syst_f2, syst_p1, syst_p2, syst_d1, syst_d2, syst_q};
 
 int string2esttype(std::string inpu) {
 	int type;
@@ -83,6 +84,8 @@ void est_dipleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm
 void est_quadleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG, Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside);
 
 void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, size_t type);
+void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, size_t type);
+std::vector< std::vector< std::vector< std::vector<double> > > > makeAN_syst(PowSpec& wcl, PowSpec& dcl, size_t lmin, size_t lmax, size_t lminCMB1, size_t lminCMB2, size_t lmaxCMB1, size_t lmaxCMB2);
 
 void map2alm_spin_iter(sharp_cxxjob<double> &job, Healpix_Map<double> &mapQ, Healpix_Map<double> &mapU, Alm<xcomplex<double> > &almG, Alm<xcomplex<double> > &almC, int spin, int num_iter);
 void map2alm_spin_iter(Healpix_Map<double> &mapQ, Healpix_Map<double> &mapU, Alm<xcomplex<double> > &almG, Alm<xcomplex<double> > &almC, int spin, int num_iter);

@@ -27,6 +27,7 @@ cdef extern from "_lensquest_cxx.cpp":
 	cdef void makeA(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB)
 	cdef void makeA_syst(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB, int type)
 	cdef vector[ vector[double] ] makeAN(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
+	cdef vector[ vector[ vector[ vector[double] ] ] ] makeAN_syst(PowSpec &wcl, PowSpec &dcl,  int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
 	cdef vector[ vector[double] ] computeKernel(string stype, PowSpec &wcl, PowSpec &dcl, int lminCMB, int L)
 	cdef void lensCls(PowSpec& llcl, PowSpec& ulcl,vector[double] &clDD) 
@@ -183,7 +184,7 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 		return al
 		
 
-def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None):
+def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None, bias=False):
 	"""Computes the norm of the quadratic estimator.
 
 	Parameters
@@ -246,7 +247,7 @@ def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, 
 		lmax_=lmaxCMB_
 	else:
 		lmax_=lmax
-        
+		
 	type_=type
 		
 
@@ -262,27 +263,53 @@ def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, 
 	nspecout=6
 
 	cdef PowSpec *al_=new PowSpec(nspecout,lmax_)
+	cdef vector[ vector[ vector[ vector[double] ] ] ] bias_
 
-	makeA_syst(wcl_[0], dcl_[0], al_[0], lmin_, lmax_, lminCMB1_, type_)
+	if bias:
+		bias_=makeAN_syst(wcl_[0], dcl_[0], lmin_, lmax_, lminCMB1_, lminCMB2_,lmaxCMB1_, lmaxCMB2_)
+		
+		del wcl_, dcl_
+		
+		nl={}
+		dists=['a','o','g1','g2','f1','f2','p1','p2','d1','d2','q']
+		
+		for i,s1 in enumerate(dists):
+			nl[s1]={}
+			for j,s2 in enumerate(dists):
+				nl[s1][s2]={}
+				nl[s1][s2]["TE"]=np.zeros(lmax_+1, dtype=np.float64)
+				nl[s1][s2]["EE"]=np.zeros(lmax_+1, dtype=np.float64)
+				nl[s1][s2]["TB"]=np.zeros(lmax_+1, dtype=np.float64)
+				nl[s1][s2]["EB"]=np.zeros(lmax_+1, dtype=np.float64)
+				for l in xrange(lmin,lmax_+1):
+					nl[s1][s2]["TE"][l]=bias_[l][i][j][0]
+					nl[s1][s2]["EE"][l]=bias_[l][i][j][1]
+					nl[s1][s2]["TB"][l]=bias_[l][i][j][2]
+					nl[s1][s2]["EB"][l]=bias_[l][i][j][3]
+
+		# del bias_
+		
+		return nl
+	else:
+		makeA_syst(wcl_[0], dcl_[0], al_[0], lmin_, lmax_, lminCMB1_, type_)
+		
+		del wcl_, dcl_
+
+		al={}
+		al["TE"] = np.zeros(lmax_+1, dtype=np.float64)
+		al["EE"] = np.zeros(lmax_+1, dtype=np.float64)
+		al["TB"] = np.zeros(lmax_+1, dtype=np.float64)
+		al["EB"] = np.zeros(lmax_+1, dtype=np.float64)
+		for l in xrange(lmin,lmax_+1):
+			al["TE"][l]=al_.tg(l)
+			al["EE"][l]=al_.gg(l)
+			al["TB"][l]=al_.tc(l)
+			al["EB"][l]=al_.gc(l)
 	
-	del wcl_, dcl_
-		
-	al={}
-	al["TE"] = np.zeros(lmax_+1, dtype=np.float64)
-	al["EE"] = np.zeros(lmax_+1, dtype=np.float64)
-	al["TB"] = np.zeros(lmax_+1, dtype=np.float64)
-	al["EB"] = np.zeros(lmax_+1, dtype=np.float64)
-	for l in xrange(lmin,lmax_+1):
-		al["TE"][l]=al_.tg(l)
-		al["EE"][l]=al_.gg(l)
-		al["TB"][l]=al_.tc(l)
-		al["EB"][l]=al_.gc(l)
-
-				
-	del al_
-		
-	return al
-		
+					
+		del al_
+			
+		return al
 
 class quest_kernel:
 	def __init__(self, type, wcl, dcl, lminCMB=2, lmaxCMB=None):
@@ -511,9 +538,9 @@ def systcls(type,ucl,clpp):
 	else: raise NotImplementedError('Input spectra should be in an array of length 4: %d given'%len(ucl_c))
 		
 	cdef int type_
-    
+	
 	type_=type
-    
+	
 	cdef vector[double] clpp_ = vector[double](lmaxpp+1,0.)
 	for l in range(lmaxpp+1):
 		clpp_[l]=clpp[l]
