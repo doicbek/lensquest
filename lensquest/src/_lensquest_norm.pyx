@@ -282,10 +282,16 @@ def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, 
 				nl[s1][s2]["TB"]=np.zeros(lmax_+1, dtype=np.float64)
 				nl[s1][s2]["EB"]=np.zeros(lmax_+1, dtype=np.float64)
 				for l in xrange(lmin,lmax_+1):
-					nl[s1][s2]["TE"][l]=bias_[l][i][j][0]
-					nl[s1][s2]["EE"][l]=bias_[l][i][j][1]
-					nl[s1][s2]["TB"][l]=bias_[l][i][j][2]
-					nl[s1][s2]["EB"][l]=bias_[l][i][j][3]
+					if j>i:
+						nl[s1][s2]["TE"][l]=bias_[l][j][i][0]
+						nl[s1][s2]["EE"][l]=bias_[l][j][i][1]
+						nl[s1][s2]["TB"][l]=bias_[l][j][i][2]
+						nl[s1][s2]["EB"][l]=bias_[l][j][i][3]
+					else:
+						nl[s1][s2]["TE"][l]=bias_[l][i][j][0]
+						nl[s1][s2]["EE"][l]=bias_[l][i][j][1]
+						nl[s1][s2]["TB"][l]=bias_[l][i][j][2]
+						nl[s1][s2]["EB"][l]=bias_[l][i][j][3]
 
 		# del bias_
 		
