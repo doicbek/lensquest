@@ -45,24 +45,12 @@ void ldiTE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= - map2Q[i]*map1U[i] + map2U[i]*map1Q[i];
-		map4[i]= map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
-	}
-	
-	almG.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almG,almZ,1,3);
-	
-	#pragma omp parallel for
-	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= - map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
+		map3[i]= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
 		map4[i]= - map2Q[i]*map1U[i] + map2U[i]*map1Q[i];
 	}
 	
 	almC.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almZ,almC,1,3);
-	
-	almG.Scale(.5);
-	almC.Scale(.5);
+	map2alm_spin_iter(job,map3,map4,almG,almC,1,3);
 }
 
 void ldiTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, Alm< xcomplex< double > > & almG,  Alm< xcomplex< double > > & almC, PowSpec& wcl, int nside, arr<double> &weight) {
@@ -112,25 +100,13 @@ void ldiTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= + map2Q[i]*map1U[i] - map2U[i]*map1Q[i];
-		map4[i]= map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map3[i]= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map4[i]= - map2Q[i]*map1U[i] + map2U[i]*map1Q[i];
 	}
 	
 	
 	almG.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almG,almZ,1,3);
-	
-	#pragma omp parallel for
-	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= - map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
-		map4[i]= - map2Q[i]*map1U[i] + map2U[i]*map1Q[i];
-	}
-
-	almC.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almZ,almC,1,3);	
-	
-	almG.Scale(.5);
-	almC.Scale(.5);
+	map2alm_spin_iter(job,map3,map4,almG,almC,1,3);
 }
 
 void ldiEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, Alm< xcomplex< double > > & almG,  Alm< xcomplex< double > > & almC, PowSpec& wcl, int nside, arr<double> &weight) {
@@ -157,8 +133,6 @@ void ldiEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	map2U.SetNside(nside,RING);
 	map3.SetNside(nside,RING);
 	map4.SetNside(nside,RING);
-	map5.SetNside(nside,RING);
-	map6.SetNside(nside,RING);
 
 	almZ.Set(lmax_alm2, lmax_alm2);
     alm2map_spin(job,alm2,almZ,map2Q,map2U,2);
@@ -182,10 +156,8 @@ void ldiEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= + map2Q[i]*map1U[i] - map2U[i]*map1Q[i];
-		map4[i]= - map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
-		map5[i]= - map2Q[i]*map1Q[i] - map2U[i]*map1U[i];
-		map6[i]= + map2Q[i]*map1U[i] - map2U[i]*map1Q[i];
+		map3[i]= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map4[i]= + map2Q[i]*map1U[i] - map2U[i]*map1Q[i];
 	}
 	
 	almZ.Set(lmax_alm1, lmax_alm1);
@@ -210,16 +182,12 @@ void ldiEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]+=  map1Q[i]*map2U[i] - map1U[i]*map2Q[i];
-		map4[i]+=  map1Q[i]*map2Q[i] + map1U[i]*map2U[i];
-		map5[i]= - map1Q[i]*map2Q[i] - map1U[i]*map2U[i];
-		map6[i]= + map1Q[i]*map2U[i] - map1U[i]*map2Q[i];
+		map3[i]+= + map1Q[i]*map2Q[i] + map1U[i]*map2U[i];
+		map4[i]+= - map1Q[i]*map2U[i] + map1U[i]*map2Q[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
-	almZ.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almG,almZ,1,3);
-	map2alm_spin_iter(job,map5,map6,almZ,almC,1,3);
+	map2alm_spin_iter(job,map3,map4,almG,almC,1,3);
 	
 	almG.Scale(.5);
 	almC.Scale(.5);
@@ -272,23 +240,11 @@ void ldiEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= + map2Q[i]*map1U[i] - map2U[i]*map1Q[i];
-		map4[i]= map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map3[i]= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
+		map4[i]= - map2Q[i]*map1U[i] + map2U[i]*map1Q[i];
 	}
 	
 	
 	almG.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almG,almZ,1,3);
-	
-	#pragma omp parallel for
-	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]= + map2Q[i]*map1Q[i] + map2U[i]*map1U[i];
-		map4[i]= + map2Q[i]*map1U[i] - map2U[i]*map1Q[i];
-	}
-
-	almC.Set(lmax_almG, lmax_almG);
-	map2alm_spin_iter(job,map3,map4,almZ,almC,1,3);	
-	
-	almG.Scale(.5);
-	almC.Scale(.5);
+	map2alm_spin_iter(job,map3,map4,almG,almC,1,3);
 }
