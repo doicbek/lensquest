@@ -9,8 +9,8 @@ void dirTE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_almG; ++m) {
 		for (size_t l=m; l<=lmax_almG; ++l) {
-			almG(l,m)*=-1.*complex_i*lsqrt[l];
-			almC(l,m)*=-1.*complex_i*lsqrt[l];
+			almG(l,m)*=lsqrt[l];
+			almC(l,m)*=-lsqrt[l];
 		}
 	}
 }
@@ -26,8 +26,8 @@ void dirTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_almG; ++m) {
 		for (size_t l=m; l<=lmax_almG; ++l) {
-			almG(l,m)*=-1.*complex_i*lsqrt[l];
-			almC(l,m)*=-1.*complex_i*lsqrt[l];
+			almG(l,m)*=lsqrt[l];
+			almC(l,m)*=-lsqrt[l];
 		}
 	}
 }
@@ -43,8 +43,8 @@ void dirEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_almG; ++m) {
 		for (size_t l=m; l<=lmax_almG; ++l) {
-			almG(l,m)*=-1.*complex_i*lsqrt[l];
-			almC(l,m)*=-1.*complex_i*lsqrt[l];
+			almG(l,m)*=lsqrt[l];
+			almC(l,m)*=-lsqrt[l];
 		}
 	}
 }
@@ -60,8 +60,8 @@ void dirEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_almG; ++m) {
 		for (size_t l=m; l<=lmax_almG; ++l) {
-			almG(l,m)*=-1.*complex_i*lsqrt[l];
-			almC(l,m)*=-1.*complex_i*lsqrt[l];
+			almG(l,m)*=lsqrt[l];
+			almC(l,m)*=-lsqrt[l];
 		}
 	}
 }

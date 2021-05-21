@@ -38,7 +38,7 @@ void lquTE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map1Q[i]=-map2Q[i]*map1U[i]+map1Q[i]*map2U[i];
+		map1Q[i]=map2Q[i]*map1U[i]-map1Q[i]*map2U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -86,7 +86,7 @@ void lquTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map1Q[i]=map2Q[i]*map1U[i]-map1Q[i]*map2U[i];
+		map1Q[i]=-map2Q[i]*map1U[i]+map1Q[i]*map2U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -140,7 +140,7 @@ void lquEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]=map1Q[i]*map2U[i] - map2Q[i]*map1U[i];
+		map3[i]=-map1Q[i]*map2U[i] + map2Q[i]*map1U[i];
 	}
 
 	almZ.Set(lmax_alm1, lmax_alm1);
@@ -165,7 +165,7 @@ void lquEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 		
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map3[i]+= - map1Q[i]*map2U[i] + map2Q[i]*map1U[i];
+		map3[i]+= + map1Q[i]*map2U[i] - map2Q[i]*map1U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);
@@ -213,7 +213,7 @@ void lquEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, A
 	
 	#pragma omp parallel for
 	for (int i=0; i< map1Q.Npix(); i++) {
-		map1Q[i]=map2Q[i]*map1U[i]-map1Q[i]*map2U[i];
+		map1Q[i]=-map2Q[i]*map1U[i]+map1Q[i]*map2U[i];
 	}
 	
 	almG.Set(lmax_almG, lmax_almG);

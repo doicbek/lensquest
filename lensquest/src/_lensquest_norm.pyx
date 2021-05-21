@@ -25,7 +25,7 @@ def cltype(cl):
 							   
 cdef extern from "_lensquest_cxx.cpp":
 	cdef void makeA(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB)
-	cdef void makeA_syst(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB, int type)
+	cdef vector[ vector[double] ] makeA_syst(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB, int type)
 	cdef vector[ vector[double] ] makeAN(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[ vector[ vector[double] ] ] ] makeAN_syst(PowSpec &wcl, PowSpec &dcl,  int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
@@ -184,7 +184,7 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 		return al
 		
 
-def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None, bias=False):
+def quest_norm_syst(typenum, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None, rdcl=None):
 	"""Computes the norm of the quadratic estimator.
 
 	Parameters
@@ -215,10 +215,9 @@ def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, 
 	nspec=cltype(wcl)
 	
 	if nspec!=cltype(dcl) or nspec<1: raise ValueError("The two power spectra arrays must be of same type and size")
-	if rdcl is not None:
-		if nspec!=cltype(rdcl): raise ValueError("The third power spectrum array must be of same type and size")
 	if nspec!=1 and nspec!=4: raise NotImplementedError("Power spectra must be given in an array of 1 (TT) or 4 (TT,EE,BB,TE) spectra")
-	 
+
+	
 	cdef int lmin_, lmax_, lminCMB1_, lminCMB2_, lmaxCMB_, lmaxCMB1_, lmaxCMB2_, type_
 	lmin_=lmin
 	lminCMB1_=lminCMB
@@ -248,25 +247,34 @@ def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, 
 	else:
 		lmax_=lmax
 		
-	type_=type
+	if typenum is None:
+		corr=True
+	else:
+		type_=typenum
+		corr=False
 		
 
 	wcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in wcl]
 	dcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in dcl]
-	if rdcl is not None: rdcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in rdcl]
+	if rdcl is not None: 
+		rdcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in rdcl]
+	else:
+		rdcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in dcl]
 	nspec=4
 	
 
 	wcl_=ndarray2cl4(wcl_c[0], wcl_c[1], wcl_c[2], wcl_c[3], lmaxCMB_)
 	dcl_=ndarray2cl4(dcl_c[0], dcl_c[1], dcl_c[2], dcl_c[3], lmaxCMB_)
+	rdcl_=ndarray2cl4(rdcl_c[0], rdcl_c[1], rdcl_c[2], rdcl_c[3], lmaxCMB_)
 	
 	nspecout=6
 
 	cdef PowSpec *al_=new PowSpec(nspecout,lmax_)
-	cdef vector[ vector[ vector[ vector[double] ] ] ] bias_
+	cdef vector[ vector[double] ] bias_
+	cdef vector[ vector[ vector[ vector[double] ] ] ] corrbias_
 
-	if bias:
-		bias_=makeAN_syst(wcl_[0], dcl_[0], lmin_, lmax_, lminCMB1_, lminCMB2_,lmaxCMB1_, lmaxCMB2_)
+	if corr:
+		corrbias_=makeAN_syst(wcl_[0], dcl_[0], lmin_, lmax_, lminCMB1_, lminCMB2_,lmaxCMB1_, lmaxCMB2_)
 		
 		del wcl_, dcl_
 		
@@ -283,39 +291,50 @@ def quest_norm_syst(type, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, 
 				nl[s1][s2]["EB"]=np.zeros(lmax_+1, dtype=np.float64)
 				for l in xrange(lmin,lmax_+1):
 					if j>i:
-						nl[s1][s2]["TE"][l]=bias_[l][j][i][0]
-						nl[s1][s2]["EE"][l]=bias_[l][j][i][1]
-						nl[s1][s2]["TB"][l]=bias_[l][j][i][2]
-						nl[s1][s2]["EB"][l]=bias_[l][j][i][3]
+						nl[s1][s2]["TE"][l]=corrbias_[l][j][i][0]
+						nl[s1][s2]["EE"][l]=corrbias_[l][j][i][1]
+						nl[s1][s2]["TB"][l]=corrbias_[l][j][i][2]
+						nl[s1][s2]["EB"][l]=corrbias_[l][j][i][3]
 					else:
-						nl[s1][s2]["TE"][l]=bias_[l][i][j][0]
-						nl[s1][s2]["EE"][l]=bias_[l][i][j][1]
-						nl[s1][s2]["TB"][l]=bias_[l][i][j][2]
-						nl[s1][s2]["EB"][l]=bias_[l][i][j][3]
+						nl[s1][s2]["TE"][l]=corrbias_[l][i][j][0]
+						nl[s1][s2]["EE"][l]=corrbias_[l][i][j][1]
+						nl[s1][s2]["TB"][l]=corrbias_[l][i][j][2]
+						nl[s1][s2]["EB"][l]=corrbias_[l][i][j][3]
 
-		# del bias_
 		
 		return nl
 	else:
-		makeA_syst(wcl_[0], dcl_[0], al_[0], lmin_, lmax_, lminCMB1_, type_)
+		bias_=makeA_syst(wcl_[0], dcl_[0], rdcl_[0], al_[0], lmin_, lmax_, lminCMB1_, type_)
 		
-		del wcl_, dcl_
+		del wcl_, dcl_, rdcl_
 
 		al={}
+		nl={}
 		al["TE"] = np.zeros(lmax_+1, dtype=np.float64)
 		al["EE"] = np.zeros(lmax_+1, dtype=np.float64)
 		al["TB"] = np.zeros(lmax_+1, dtype=np.float64)
 		al["EB"] = np.zeros(lmax_+1, dtype=np.float64)
+		nl["TETE"]=np.zeros(lmax_+1, dtype=np.float64)
+		nl["TEEE"]=np.zeros(lmax_+1, dtype=np.float64)
+		nl["EEEE"]=np.zeros(lmax_+1, dtype=np.float64)
+		nl["TBTB"]=np.zeros(lmax_+1, dtype=np.float64)
+		nl["TBEB"]=np.zeros(lmax_+1, dtype=np.float64)
+		nl["EBEB"]=np.zeros(lmax_+1, dtype=np.float64)
 		for l in xrange(lmin,lmax_+1):
 			al["TE"][l]=al_.tg(l)
 			al["EE"][l]=al_.gg(l)
 			al["TB"][l]=al_.tc(l)
 			al["EB"][l]=al_.gc(l)
-	
+			nl["TETE"][l]=bias_[0][l]
+			nl["TEEE"][l]=bias_[1][l]
+			nl["EEEE"][l]=bias_[2][l]
+			nl["TBTB"][l]=bias_[3][l]
+			nl["TBEB"][l]=bias_[4][l]
+			nl["EBEB"][l]=bias_[5][l]
 					
 		del al_
 			
-		return al
+		return {'A':al,'N':nl}
 
 class quest_kernel:
 	def __init__(self, type, wcl, dcl, lminCMB=2, lmaxCMB=None):

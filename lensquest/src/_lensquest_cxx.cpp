@@ -252,16 +252,16 @@ void computef_systfa(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2==0) {
-				f[0][l1][l3]=wcl.tg(l1)*F[l3][l1];
-				f[1][l1][l3]=wcl.gg(l1)*F[l3][l1]+wcl.gg(l3)*F[l1][l3];
+				f[0][l1][l3]=wcl.tg(l1)*complex_i*F[l3][l1];
+				f[1][l1][l3]=wcl.gg(l1)*complex_i*F[l3][l1]+wcl.gg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
 			else {
 				f[0][l1][l3]=0.0; 
 				f[1][l1][l3]=0.0; 
-				f[2][l1][l3]=-wcl.tg(l1)*F[l3][l1];
-				f[3][l1][l3]=-wcl.gg(l1)*F[l3][l1]+wcl.cc(l3)*F[l1][l3];
+				f[2][l1][l3]=-wcl.tg(l1)*complex_i*F[l3][l1];
+				f[3][l1][l3]=-wcl.gg(l1)*complex_i*F[l3][l1]+wcl.cc(l3)*complex_i*F[l1][l3];
 			}
 		}
 	}
@@ -279,16 +279,16 @@ void computef_systfb(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
-				f[0][l1][l3]=-wcl.tg(l1)*F[l3][l1];
-				f[1][l1][l3]=-wcl.gg(l1)*F[l3][l1]+wcl.gg(l3)*F[l1][l3];
+				f[0][l1][l3]=-wcl.tg(l1)*complex_i*F[l3][l1];
+				f[1][l1][l3]=-wcl.gg(l1)*complex_i*F[l3][l1]+wcl.gg(l3)*complex_i*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
 			else {
 				f[0][l1][l3]=0.0; 
 				f[1][l1][l3]=0.0; 
-				f[2][l1][l3]=wcl.tg(l1)*F[l3][l1];
-				f[3][l1][l3]=wcl.gg(l1)*F[l3][l1]-wcl.cc(l3)*F[l1][l3];
+				f[2][l1][l3]=wcl.tg(l1)*complex_i*F[l3][l1];
+				f[3][l1][l3]=wcl.gg(l1)*complex_i*F[l3][l1]-wcl.cc(l3)*complex_i*F[l1][l3];
 			}
 		}
 	}
@@ -418,16 +418,16 @@ void computef_systda(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2==0) {
-				f[0][l1][l3]=wcl.tt(l1)*F[l3][l1];
-				f[1][l1][l3]=wcl.tg(l1)*F[l3][l1]+wcl.tg(l3)*F[l1][l3];
+				f[0][l1][l3]=-wcl.tt(l1)*F[l3][l1];
+				f[1][l1][l3]=-wcl.tg(l1)*F[l3][l1]-wcl.tg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
 			else {
 				f[0][l1][l3]=0.0; 
 				f[1][l1][l3]=0.0; 
-				f[2][l1][l3]=-wcl.tt(l1)*F[l3][l1];
-				f[3][l1][l3]=-wcl.tg(l1)*F[l3][l1];
+				f[2][l1][l3]=+wcl.tt(l1)*F[l3][l1];
+				f[3][l1][l3]=+wcl.tg(l1)*F[l3][l1];
 			}
 		}
 	}
@@ -445,16 +445,16 @@ void computef_systdb(std::vector< std::vector< std::vector<xcomplex< double >> >
 	for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 		for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 			if ((l1+L+l3)%2!=0) {
-				f[0][l1][l3]=-wcl.tt(l1)*F[l3][l1];
-				f[1][l1][l3]=-wcl.tg(l1)*F[l3][l1]+wcl.tg(l3)*F[l1][l3];
+				f[0][l1][l3]=+wcl.tt(l1)*F[l3][l1];
+				f[1][l1][l3]=+wcl.tg(l1)*F[l3][l1]-wcl.tg(l3)*F[l1][l3];
 				f[2][l1][l3]=0.0; 
 				f[3][l1][l3]=0.0;
 			}
 			else {
 				f[0][l1][l3]=0.0; 
 				f[1][l1][l3]=0.0; 
-				f[2][l1][l3]=wcl.tt(l1)*F[l3][l1];
-				f[3][l1][l3]=wcl.tg(l1)*F[l3][l1];
+				f[2][l1][l3]=-wcl.tt(l1)*F[l3][l1];
+				f[3][l1][l3]=-wcl.tg(l1)*F[l3][l1];
 			}
 		}
 	}
@@ -556,11 +556,12 @@ std::vector< std::vector< std::vector< std::vector<double> > > > makeAN_syst(Pow
 }
 
 
-void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, int type) {
+std::vector< std::vector<double> > makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& rdcls, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, int type) {
 	size_t lmaxCMB=dcl.Lmax();
 			
 	std::vector< std::vector< std::vector<xcomplex< double >> > > f(4, std::vector< std::vector<xcomplex< double >> >(lmaxCMB+1, std::vector<xcomplex< double >>(lmaxCMB+1,0.0)));
 
+	std::vector< std::vector<double> > bias(6, std::vector<double>(lmax+1,0.0));
 	std::vector<double> invlcltt(lmaxCMB+1,0.0), invlclee(lmaxCMB+1,0.0), invlclbb(lmaxCMB+1,0.0);
 	
 	#pragma omp parallel for
@@ -571,6 +572,7 @@ void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lma
 	}
 	
 	double ate, aee, atb, aeb;
+	double ntete, nteee, ntetb, nteeb, neeee, neetb, neeeb, ntbtb, ntbeb, nebeb;
 	
 	for (size_t L=lmin;L<lmax+1;L++) {
 		
@@ -588,15 +590,23 @@ void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lma
 		else if (type==10) computef_systq(f,L,wcl,lminCMB,lmaxCMB);
 		
 		ate=0.; aee=0.; atb=0.; aeb=0.;
+		ntete=0.; nteee=0.; ntetb=0.; nteeb=0.; neeee=0.; neetb=0.; neeeb=0.; ntbtb=0.; ntbeb=0.; nebeb=0.;
 		
 		if (L>=lmin) {
-			#pragma omp parallel for reduction(+:ate, aee, atb, aeb) schedule(dynamic, 25)
+			#pragma omp parallel for reduction(+:ate, aee, atb, aeb, ntete, nteee, ntetb, nteeb, neeee, neetb, neeeb, ntbtb, ntbeb, nebeb) schedule(dynamic, 25)
 			for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 				for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 					ate+=real(f[0][l1][l3]*conj(f[0][l1][l3]))*invlcltt[l1]*invlclee[l3];
 					aee+=real(f[1][l1][l3]*conj(f[1][l1][l3]))*invlclee[l1]*invlclee[l3]*.5;
 					atb+=real(f[2][l1][l3]*conj(f[2][l1][l3]))*invlcltt[l1]*invlclbb[l3]; 
 					aeb+=real(f[3][l1][l3]*conj(f[3][l1][l3]))*invlclee[l1]*invlclbb[l3];
+
+					ntete+=real(f[0][l1][l3]*invlcltt[l1]*invlclee[l3]*(conj(f[0][l1][l3])*invlcltt[l1]*invlclee[l3]*rdcls.tt(l1)*rdcls.gg(l3)+sgn(L+l1+l3)*conj(f[0][l3][l1])*invlcltt[l3]*invlclee[l1]*rdcls.tg(l1)*rdcls.tg(l3)));
+					nteee+=real(f[0][l1][l3]*invlcltt[l1]*invlclee[l3]*(conj(f[1][l1][l3])*invlclee[l1]*invlclee[l3]*rdcls.tg(l1)*rdcls.gg(l3)+sgn(L+l1+l3)*conj(f[1][l3][l1])*invlclee[l3]*invlclee[l1]*rdcls.tg(l1)*rdcls.gg(l3))*.5);
+					neeee+=real(f[1][l1][l3]*invlclee[l1]*invlclee[l3]*(conj(f[1][l1][l3])*invlclee[l1]*invlclee[l3]*rdcls.gg(l1)*rdcls.gg(l3)+sgn(L+l1+l3)*conj(f[1][l3][l1])*invlclee[l3]*invlclee[l1]*rdcls.gg(l1)*rdcls.gg(l3))*.25);
+					ntbtb+=real(f[2][l1][l3]*invlcltt[l1]*invlclbb[l3]*(conj(f[2][l1][l3])*invlcltt[l1]*invlclbb[l3]*rdcls.tt(l1)*rdcls.cc(l3)));
+					ntbeb+=real(f[2][l1][l3]*invlcltt[l1]*invlclbb[l3]*(conj(f[3][l1][l3])*invlclee[l1]*invlclbb[l3]*rdcls.tg(l1)*rdcls.cc(l3)));
+					nebeb+=real(f[3][l1][l3]*invlclee[l1]*invlclbb[l3]*(conj(f[3][l1][l3])*invlclee[l1]*invlclbb[l3]*rdcls.gg(l1)*rdcls.cc(l3)));
 				}
 			}
 		}
@@ -606,10 +616,19 @@ void makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& al, size_t lmin, size_t lma
 		al.tc(L) = (atb!=0.) ? (2.0*L+1.0)/atb : 0.0;
 		al.gc(L) = (aeb!=0.) ? (2.0*L+1.0)/aeb : 0.0;
 		
+		bias[0][L]=ntete*al.tg(L)*al.tg(L)/(2.*L+1.);
+		bias[1][L]=nteee*al.tg(L)*al.gg(L)/(2.*L+1.);
+		bias[2][L]=neeee*al.gg(L)*al.gg(L)/(2.*L+1.);
+		bias[3][L]=ntbtb*al.tc(L)*al.tc(L)/(2.*L+1.);
+		bias[4][L]=ntbeb*al.tc(L)*al.gc(L)/(2.*L+1.);
+		bias[5][L]=nebeb*al.gc(L)*al.gc(L)/(2.*L+1.);
+		
 		if(PyErr_CheckSignals() == -1) {
 			throw invalid_argument( "Keyboard interrupt" );
 		}
 	}
+	
+	return bias;
 }
 
 void lensCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD) {
