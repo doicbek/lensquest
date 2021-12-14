@@ -36,7 +36,6 @@ void lensTT(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, 
 	} 
 
 	job.set_triangular_alm_info (lmax_alm2, lmax_alm2);	
-	almG.Set(lmax_alm2, lmax_alm2);
 	almC.Set(lmax_alm2, lmax_alm2);
 	alm2map_spin(job,almG,almC,map2Q,map2U,1);
 

@@ -26,6 +26,8 @@ def cltype(cl):
 cdef extern from "_lensquest_cxx.cpp":
 	cdef void makeA(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB)
 	cdef vector[ vector[double] ] makeA_syst(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB, int type)
+	cdef vector[ vector[double] ] makeA_dust(PowSpec &wcl, PowSpec &dcl1, PowSpec &dcl2, PowSpec &R1, PowSpec &R2, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB)
+	cdef vector[ vector[ vector[ vector[ vector[ vector[double] ] ] ] ] ] makeX_dust(PowSpec &wcl, vector[ vector[ vector[double] ] ] & dcl, vector[ vector[ vector[ vector[double] ] ] ] & rd, vector[ vector[ vector[ vector[double] ] ] ] & al, vector[vector[vector[double]]] & rlnu, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeAN(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[ vector[ vector[double] ] ] ] makeAN_syst(PowSpec &wcl, PowSpec &dcl,  int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
@@ -335,6 +337,230 @@ def quest_norm_syst(typenum, wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=Non
 		del al_
 			
 		return {'A':al,'N':nl}
+
+def quest_norm_dust(wcl, dcl1, dcl2, r1, r2, rdcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None):
+	"""Computes the norm of the quadratic estimator.
+
+	Parameters
+	----------
+	wcl : array-like, shape (1,lmaxCMB) or (4, lmaxCMB)
+	  The input power spectra (lensed or unlensed) used in the weights of the normalization a la Okamoto & Hu, either TT only or TT, EE, BB and TE (polarization).
+	dcl : array-like, shape (1,lmaxCMB) or (4, lmaxCMB)
+	  The (noisy) input power spectra used in the denominators of the normalization (i.e. Wiener filtering), either TT only or TT, EE, BB and TE (polarization).
+	lmin : int, scalar, optional
+	  Minimum l of the normalization. Default: 2
+	lmax : int, scalar, optional
+	  Maximum l of the normalization. Default: lmaxCMB
+	lminCMB : int, scalar, optional
+	  Minimum l of the CMB power spectra. Default: 2
+	lmaxCMB : int, scalar, optional
+	  Maximum l of the CMB power spectra. Default: given by input cl arrays
+	bias: bool, scalar, optional
+	  Additionally computing the N0 bias. Default: False
+	
+	Returns
+	-------
+	AL: array or tuple of arrays
+	  Normalization for 1 (TT) or 5 (TT,TE,EE,TB,EB) quadratic estimators.
+	"""
+	
+	cdef int nspec, nspecout
+
+	nspec=cltype(wcl)
+	
+	if nspec!=cltype(dcl1) or nspec<1: raise ValueError("The two power spectra arrays must be of same type and size")
+	if nspec!=1 and nspec!=4: raise NotImplementedError("Power spectra must be given in an array of 1 (TT) or 4 (TT,EE,BB,TE) spectra")
+
+	
+	cdef int lmin_, lmax_, lminCMB1_, lminCMB2_, lmaxCMB_, lmaxCMB1_, lmaxCMB2_, type_
+	lmin_=lmin
+	lminCMB1_=lminCMB
+	if lmaxCMB is None:
+		if nspec==1:
+			lmaxCMB=len(wcl)-1
+		else:
+			lmaxCMB=len(wcl[0])-1
+
+	lmaxCMB_=lmaxCMB
+	lmaxCMB1_=lmaxCMB
+		
+	if lmaxCMB2 is None:
+		lmaxCMB2_=lmaxCMB_
+	else:
+		lmaxCMB2_=lmaxCMB2
+		lmaxCMB_=np.max([lmaxCMB,lmaxCMB2])
+	
+	if lminCMB2 is None:
+		lminCMB2_=lminCMB1_
+	else:
+		lminCMB2_=lminCMB2
+		
+	
+	if lmax is None:
+		lmax_=lmaxCMB_
+	else:
+		lmax_=lmax
+
+		
+
+	wcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in wcl]
+	dcl1_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in dcl1]
+	dcl2_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in dcl2]
+	r1_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in r1]
+	r2_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in r2]
+	rdcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in rdcl]
+	
+	nspec=4
+	
+
+	wcl_=ndarray2cl4(wcl_c[0], wcl_c[1], wcl_c[2], wcl_c[3], lmaxCMB_)
+	dcl1_=ndarray2cl4(dcl1_c[0], dcl1_c[1], dcl1_c[2], dcl1_c[3], lmaxCMB_)
+	dcl2_=ndarray2cl4(dcl2_c[0], dcl2_c[1], dcl2_c[2], dcl2_c[3], lmaxCMB_)
+	r1_=ndarray2cl4(r1_c[0], r1_c[1], r1_c[2], 0*r1_c[0], lmaxCMB_)
+	r2_=ndarray2cl4(r2_c[0], r2_c[1], r2_c[2], 0*r2_c[0], lmaxCMB_)
+	rdcl_=ndarray2cl4(rdcl_c[0], rdcl_c[1], rdcl_c[2], rdcl_c[3], lmaxCMB_)
+	
+	nspecout=6
+
+	cdef PowSpec *al_=new PowSpec(nspecout,lmax_)
+	cdef vector[ vector[double] ] bias_
+
+	bias_=makeA_dust(wcl_[0], dcl1_[0], dcl2_[0], r1_[0], r2_[0], rdcl_[0], al_[0], lmin_, lmax_, lminCMB1_)
+	
+	del wcl_, dcl1_, dcl2_, r1_, r2_, rdcl_
+
+	al={}
+	nl={}
+	al["TT"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["TE"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["EE"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["TB"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["EB"] = np.zeros(lmax_+1, dtype=np.float64)
+	al["BB"] = np.zeros(lmax_+1, dtype=np.float64)
+	nl["TTTT"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["TTTE"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["TTEE"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["TETE"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["TEEE"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["EEEE"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["TBTB"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["TBEB"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["EBEB"]=np.zeros(lmax_+1, dtype=np.float64)
+	nl["BBBB"]=np.zeros(lmax_+1, dtype=np.float64)
+	for l in xrange(lmin,lmax_+1):
+		al["TT"][l]=al_.tt(l)
+		al["TE"][l]=al_.tg(l)
+		al["EE"][l]=al_.gg(l)
+		al["TB"][l]=al_.tc(l)
+		al["EB"][l]=al_.gc(l)
+		al["BB"][l]=al_.cc(l)
+		nl["TTTT"][l]=bias_[0][l]
+		nl["TTTE"][l]=bias_[1][l]
+		nl["TTEE"][l]=bias_[2][l]
+		nl["TETE"][l]=bias_[3][l]
+		nl["TEEE"][l]=bias_[4][l]
+		nl["EEEE"][l]=bias_[5][l]
+		nl["TBTB"][l]=bias_[6][l]
+		nl["TBEB"][l]=bias_[7][l]
+		nl["EBEB"][l]=bias_[8][l]
+		nl["BBBB"][l]=bias_[9][l]
+				
+				
+	del al_
+		
+	return {'A':al,'N':nl}
+
+	
+def quest_norm_dust_x(wcl, dcl, rd, rlnu, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=None, lmaxCMB2=None):
+	cdef int nspec, nspecout, nfreq
+	
+	nspec=cltype(wcl)
+	
+	nfreq=len(dcl)
+	
+	if nspec!=1 and nspec!=4: raise NotImplementedError("Power spectra must be given in an array of 1 (TT) or 4 (TT,EE,BB,TE) spectra")
+	 
+	cdef int lmin_, lmax_, lminCMB1_, lminCMB2_, lmaxCMB_, lmaxCMB1_, lmaxCMB2_
+	lmin_=lmin
+	lminCMB1_=lminCMB
+	if lmaxCMB is None:
+		if nspec==1:
+			lmaxCMB=len(wcl)-1
+		else:
+			lmaxCMB=len(wcl[0])-1
+
+	lmaxCMB_=lmaxCMB
+	lmaxCMB1_=lmaxCMB
+		
+	if lmaxCMB2 is None:
+		lmaxCMB2_=lmaxCMB_
+	else:
+		lmaxCMB2_=lmaxCMB2
+		lmaxCMB_=np.max([lmaxCMB,lmaxCMB2])
+	
+	if lminCMB2 is None:
+		lminCMB2_=lminCMB1_
+	else:
+		lminCMB2_=lminCMB2
+	
+	if lmax is None:
+		lmax_=lmaxCMB_
+	else:
+		lmax_=lmax
+		
+	if nspec==1:
+		wcl_c = np.ascontiguousarray(wcl[:lmaxCMB_+1], dtype=np.float64)
+		nspec=1
+	elif nspec==4:
+		wcl_c = [np.ascontiguousarray(cl[:lmaxCMB_+1], dtype=np.float64) for cl in wcl]
+		nspec=4
+	
+	nspecout=0
+
+	if nspec==1:
+		wcl_=ndarray2cl1(wcl_c, lmaxCMB_)
+		nspecout=1
+	elif nspec==4:
+		wcl_=ndarray2cl4(wcl_c[0], wcl_c[1], wcl_c[2], wcl_c[3], lmaxCMB_)
+		nspecout=6
+
+	cdef vector[ vector[ vector[ vector[double] ] ] ] al_
+	al_=np.zeros((lmax_+1,nfreq,nfreq,6),dtype=np.float64)
+	
+	cdef vector[ vector[ vector[ vector[ vector[ vector[double] ] ] ] ] ] bias_
+	cdef vector[ vector[ vector[ vector[double] ] ] ] rd_
+	cdef vector[ vector[ vector[ double] ] ] dcl_
+	cdef vector[ vector[ vector[ double] ] ]  rlnu_
+	
+	rd_=rd
+	dcl_=dcl
+	rlnu_=rlnu
+
+	bias_=makeX_dust(wcl_[0], dcl_, rd_, al_, rlnu_, lmin_, lmax_, lminCMB1_, lminCMB2_,lmaxCMB1_, lmaxCMB2_)
+
+	del wcl_
+
+	A={}
+	A['TT']=np.moveaxis(np.array(al_)[:,:,:,0], 0, -1)
+	A['TE']=np.moveaxis(np.array(al_)[:,:,:,1], 0, -1)
+	A['EE']=np.moveaxis(np.array(al_)[:,:,:,2], 0, -1)
+	A['TB']=np.moveaxis(np.array(al_)[:,:,:,3], 0, -1)
+	A['EB']=np.moveaxis(np.array(al_)[:,:,:,4], 0, -1)
+	A['BB']=np.moveaxis(np.array(al_)[:,:,:,5], 0, -1)
+
+	N={}
+	N['TTTT']=np.moveaxis(np.array(bias_)[:,:,:,:,:,0], 0, -1)
+	N['TTTE']=np.moveaxis(np.array(bias_)[:,:,:,:,:,1], 0, -1)
+	N['TTEE']=np.moveaxis(np.array(bias_)[:,:,:,:,:,2], 0, -1)
+	N['TETE']=np.moveaxis(np.array(bias_)[:,:,:,:,:,3], 0, -1)
+	N['TEEE']=np.moveaxis(np.array(bias_)[:,:,:,:,:,4], 0, -1)
+	N['EEEE']=np.moveaxis(np.array(bias_)[:,:,:,:,:,5], 0, -1)
+	N['TBTB']=np.moveaxis(np.array(bias_)[:,:,:,:,:,6], 0, -1)
+	N['TBEB']=np.moveaxis(np.array(bias_)[:,:,:,:,:,7], 0, -1)
+	N['EBEB']=np.moveaxis(np.array(bias_)[:,:,:,:,:,8], 0, -1)
+	N['BBBB']=np.moveaxis(np.array(bias_)[:,:,:,:,:,9], 0, -1)
+	
+	return A,N
 
 class quest_kernel:
 	def __init__(self, type, wcl, dcl, lminCMB=2, lmaxCMB=None):
