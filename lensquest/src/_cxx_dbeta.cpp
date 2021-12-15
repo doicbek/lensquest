@@ -22,7 +22,7 @@ void dbetaTT(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm2; ++m) {
 		for (size_t l=m; l<=lmax_alm2; ++l) {
-			almG(l,m)=rl1[l][0]*alm1(l,m);
+			almG(l,m)=rl1[l]*alm1(l,m);
 		}
 	} 
     alm2map_(job,almG,map1Q);
@@ -71,7 +71,7 @@ void dbetaTE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm1; ++m) {
 		for (size_t l=m; l<=lmax_alm1; ++l) {
-			almG(l,m)=rl2[l][1]*alm2(l,m);
+			almG(l,m)=rl2[l]*alm2(l,m);
 		}
 	} 
     almZ.Set(lmax_alm2, lmax_alm2);
@@ -120,7 +120,7 @@ void dbetaTB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm1; ++m) {
 		for (size_t l=m; l<=lmax_alm1; ++l) {
-			almG(l,m)=rl2[l][2]*alm2(l,m);
+			almG(l,m)=rl2[l]*alm2(l,m);
 		}
 	} 
 	almZ.Set(lmax_alm2, lmax_alm2);
@@ -171,7 +171,7 @@ void dbetaEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm1; ++m) {
 		for (size_t l=m; l<=lmax_alm1; ++l) {
-			almG(l,m)=rl2[l][1]*alm2(l,m);
+			almG(l,m)=rl2[l]*alm2(l,m);
 		}
 	} 
 	almZ.Set(lmax_alm2, lmax_alm2);
@@ -196,7 +196,7 @@ void dbetaEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm2; ++m) {
 		for (size_t l=m; l<=lmax_alm2; ++l) {
-			almG(l,m)=rl1[l][1]*alm1(l,m);
+			almG(l,m)=rl1[l]*alm1(l,m);
 		}
 	} 
 	almZ.Set(lmax_alm1, lmax_alm1);
@@ -249,7 +249,7 @@ void dbetaEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm1; ++m) {
 		for (size_t l=m; l<=lmax_alm1; ++l) {
-			almG(l,m)=rl2[l][2]*alm2(l,m);
+			almG(l,m)=rl2[l]*alm2(l,m);
 		}
 	} 
 	almZ.Set(lmax_alm2, lmax_alm2);
@@ -275,7 +275,7 @@ void dbetaEB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm2; ++m) {
 		for (size_t l=m; l<=lmax_alm2; ++l) {
-			almG(l,m)=rl1[l][1]*alm1(l,m);
+			almG(l,m)=rl1[l]*alm1(l,m);
 		}
 	} 
     almZ.Set(lmax_alm1, lmax_alm1);
@@ -327,7 +327,7 @@ void dbetaBB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm1; ++m) {
 		for (size_t l=m; l<=lmax_alm1; ++l) {
-			almG(l,m)=rl2[l][2]*alm2(l,m);
+			almG(l,m)=rl2[l]*alm2(l,m);
 		}
 	} 
 	almZ.Set(lmax_alm2, lmax_alm2);
@@ -352,7 +352,7 @@ void dbetaBB(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2,
 	#pragma omp parallel for
 	for (size_t m=0; m<=lmax_alm2; ++m) {
 		for (size_t l=m; l<=lmax_alm2; ++l) {
-			almG(l,m)=rl1[l][2]*alm1(l,m);
+			almG(l,m)=rl1[l]*alm1(l,m);
 		}
 	} 
 	almZ.Set(lmax_alm1, lmax_alm1);
