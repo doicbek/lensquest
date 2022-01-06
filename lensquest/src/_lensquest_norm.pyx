@@ -27,7 +27,7 @@ cdef extern from "_lensquest_cxx.cpp":
 	cdef void makeA(PowSpec &wcl, PowSpec &dcl, PowSpec &al, int lmin, int lmax, int lminCMB)
 	cdef vector[ vector[double] ] makeA_syst(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB, int type)
 	cdef vector[ vector[double] ] makeA_dust(PowSpec &wcl, PowSpec &dcl1, PowSpec &dcl2, PowSpec &R1, PowSpec &R2, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB)
-	cdef vector[ vector[ vector[ vector[ vector[ vector[double] ] ] ] ] ] makeX_dust(PowSpec &wcl, vector[ vector[ vector[double] ] ] & dcl, vector[ vector[ vector[ vector[double] ] ] ] & rd, vector[ vector[ vector[ vector[double] ] ] ] & al, vector[vector[vector[double]]] & rlnu, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
+	cdef vector[ vector[ vector[ vector[ vector[ vector[double] ] ] ] ] ] makeX_dust(PowSpec &wcl, vector[ vector[ vector[double] ] ] & dcl, vector[ vector[ vector[ vector[double] ] ] ] & rd, vector[ vector[ vector[ vector[double] ] ] ] & al, vector[ vector[ vector[vector[double] ] ] ] & rlnu, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeAN(PowSpec &wcl, PowSpec &dcl, PowSpec &rdcls, PowSpec &al, int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[ vector[ vector[double] ] ] ] makeAN_syst(PowSpec &wcl, PowSpec &dcl,  int lmin, int lmax, int lminCMB1, int lminCMB2, int lmaxCMB1, int lmaxCMB2)
 	cdef vector[ vector[double] ] makeA_BH(string stype, PowSpec &wcl, PowSpec &dcl, int lmin, int lmax, int lminCMB)
@@ -529,8 +529,8 @@ def quest_norm_dust_x(wcl, dcl, rd, rlnu, lmin=2, lmax=None, lminCMB=2, lmaxCMB=
 	
 	cdef vector[ vector[ vector[ vector[ vector[ vector[double] ] ] ] ] ] bias_
 	cdef vector[ vector[ vector[ vector[double] ] ] ] rd_
-	cdef vector[ vector[ vector[ double] ] ] dcl_
-	cdef vector[ vector[ vector[ double] ] ]  rlnu_
+	cdef vector[ vector[ vector[double] ] ] dcl_
+	cdef vector[ vector[ vector[ vector[double]] ] ]  rlnu_
 	
 	rd_=rd
 	dcl_=dcl

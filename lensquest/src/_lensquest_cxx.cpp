@@ -823,20 +823,20 @@ void computef_dust(std::vector< std::vector< std::vector<double> > >& f, std::ve
 		for (size_t l1=lminCMB;l1<lmaxCMB+1;l1++) {
 			for (size_t l3=lminCMB;l3<lmaxCMB+1;l3++) {
 				if ((l1+L+l3)%2==0) {
-					f[tt][l1][l3]=wcl.tt(l1)*R2[0][l3]*Fz[l3][l1]+wcl.tt(l3)*R1[0][l1]*Fz[l1][l3];
-					f[te][l1][l3]=wcl.tg(l1)*R2[1][l3]*F[l3][l1]+wcl.tg(l3)*R1[0][l1]*Fz[l1][l3];
-					f[ee][l1][l3]=wcl.gg(l1)*R2[1][l3]*F[l3][l1]+wcl.gg(l3)*R1[1][l1]*F[l1][l3];
+					f[tt][l1][l3]=wcl.tt(l1)*R1[0][l3]*Fz[l3][l1]+wcl.tt(l3)*R2[0][l1]*Fz[l1][l3];
+					f[te][l1][l3]=wcl.tg(l1)*R1[1][l3]*F[l3][l1]+wcl.tg(l3)*R2[0][l1]*Fz[l1][l3];
+					f[ee][l1][l3]=wcl.gg(l1)*R1[1][l3]*F[l3][l1]+wcl.gg(l3)*R2[1][l1]*F[l1][l3];
 					f[tb][l1][l3]=0.0; 
 					f[eb][l1][l3]=0.0;
-					f[bb][l1][l3]=wcl.cc(l1)*R2[2][l3]*F[l3][l1]+wcl.cc(l3)*R1[2][l1]*F[l1][l3];
+					f[bb][l1][l3]=wcl.cc(l1)*R1[2][l3]*F[l3][l1]+wcl.cc(l3)*R2[2][l1]*F[l1][l3];
 				}
 				else {
 					f[tt][l1][l3]=0.0;
 					f[te][l1][l3]=0.0; 
 					f[ee][l1][l3]=0.0; 
-					f[tb][l1][l3]=-wcl.tg(l1)*R2[1][l3]*F[l3][l1];
-					f[eb][l1][l3]=-wcl.gg(l1)*R2[1][l3]*F[l3][l1]+wcl.cc(l3)*R1[2][l1]*F[l1][l3];
-					f[bb][l1][l3]=0.0; 
+					f[tb][l1][l3]=-wcl.tg(l1)*R1[1][l3]*F[l3][l1];
+					f[eb][l1][l3]=wcl.gg(l1)*R1[1][l3]*F[l3][l1]-wcl.cc(l3)*R2[2][l1]*F[l1][l3];
+					f[bb][l1][l3]=0.0;
 				}
 			}
 		}
@@ -845,7 +845,7 @@ void computef_dust(std::vector< std::vector< std::vector<double> > >& f, std::ve
 }
 
 #pragma omp declare reduction(vec_double_plus : std::vector< double > : std::transform(omp_out.begin(), omp_out.end(), omp_in.begin(), omp_out.begin(), std::plus<double>())) initializer(omp_priv = omp_orig)
-std::vector< std::vector< std::vector< std::vector< std::vector<std::vector< double > > > > > > makeX_dust(PowSpec &wcl, std::vector< std::vector< std::vector<double> > > & dcl, std::vector< std::vector< std::vector< std::vector<double> > > > & rd, std::vector<std::vector< std::vector< std::vector<double> > > >& al, std::vector<std::vector<std::vector<double>>>& rlnu, size_t lmin, size_t lmax, size_t lminCMB1, size_t lminCMB2, size_t lmaxCMB1, size_t lmaxCMB2) {
+std::vector< std::vector< std::vector< std::vector< std::vector<std::vector< double > > > > > > makeX_dust(PowSpec &wcl, std::vector< std::vector< std::vector<double> > > & dcl, std::vector< std::vector< std::vector< std::vector<double> > > > & rd, std::vector<std::vector< std::vector< std::vector<double> > > >& al, std::vector<std::vector<std::vector<std::vector<double>>>>& rlnu, size_t lmin, size_t lmax, size_t lminCMB1, size_t lminCMB2, size_t lmaxCMB1, size_t lmaxCMB2) {
 	int num_spec=6;
 	enum fourpoint {xtttt, xttte, xttee, xtttb, xtteb, xtett, xtete, xteee, xtetb, xteeb, xeett, xeete, xeeee, xeetb, xeeeb, xtbtt, xtbte, xtbee, xtbtb, xtbeb, xebtt, xebte, xebee, xebtb, xebeb, xbbbb};
 	enum twopoint {xtt, xee, xbb, xte, xeb, xtb};
@@ -876,7 +876,7 @@ std::vector< std::vector< std::vector< std::vector< std::vector<std::vector< dou
 		for (size_t a=0;a<dcl.size();a++) {
 			for (size_t b=0;b<dcl.size();b++) {
 				
-				computef_dust(f,rlnu[a],rlnu[b],L,wcl,lminCMB,lmaxCMB,num_spec);
+				computef_dust(f,rlnu[a][b],rlnu[b][a],L,wcl,lminCMB,lmaxCMB,num_spec);
 				
 				
 				std::fill(temp_.begin(), temp_.end(), 0.);
