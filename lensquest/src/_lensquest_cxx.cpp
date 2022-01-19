@@ -987,7 +987,6 @@ std::vector< std::vector< std::vector< std::vector< std::vector<std::vector< dou
 									// temp_[asbeeb]+=f[asbe][l1][l3]*dcl[a][xbb][l1]*dcl[b][xee][l3]*(sgn(L+l1+l3)*f[aseb][l3][l1]*dcl[c][xee][l3]*dcl[d][xbb][l1]*rd[a][d][xbb][l1]*rd[b][c][xee][l3]);
 									// temp_[asbebe]+=f[asbe][l1][l3]*dcl[a][xbb][l1]*dcl[b][xee][l3]*(f[asbe][l1][l3]*dcl[c][xbb][l1]*dcl[d][xee][l3]*rd[a][c][xbb][l1]*rd[b][d][xee][l3]);
 									
-									
 									temp_[tttt]+=f[tt][l1][l3]*dcl[a][xtt][l1]*dcl[b][xtt][l3]*(f[tt][l1][l3]*dcl[c][xtt][l1]*dcl[d][xtt][l3]*rd[a][c][xtt][l1]*rd[b][d][xtt][l3]+sgn(L+l1+l3)*f[tt][l3][l1]*dcl[c][xtt][l3]*dcl[d][xtt][l1]*rd[a][d][xtt][l1]*rd[b][c][xtt][l3])*.25;
 									temp_[ttte]+=f[tt][l1][l3]*dcl[a][xtt][l1]*dcl[b][xtt][l3]*(f[te][l1][l3]*dcl[c][xtt][l1]*dcl[d][xee][l3]*rd[a][c][xtt][l1]*rd[b][d][xte][l3]+sgn(L+l1+l3)*f[te][l3][l1]*dcl[c][xtt][l3]*dcl[d][xee][l1]*rd[a][d][xte][l1]*rd[b][c][xtt][l3])*.5;
 									temp_[ttee]+=f[tt][l1][l3]*dcl[a][xtt][l1]*dcl[b][xtt][l3]*(f[ee][l1][l3]*dcl[c][xee][l1]*dcl[d][xee][l3]*rd[a][c][xte][l1]*rd[b][d][xte][l3]+sgn(L+l1+l3)*f[ee][l3][l1]*dcl[c][xee][l3]*dcl[d][xee][l1]*rd[a][d][xte][l1]*rd[b][c][xte][l3])*.25;
