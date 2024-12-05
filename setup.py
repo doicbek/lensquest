@@ -25,7 +25,7 @@ LIBS=['healpix_cxx','sharp']#,'cxxsupport','sharp','fftpack','c_utils']
 OPTIONS=['-O3','-std=c++11','-fopenmp','-fPIC']
 
 setup(name='lensquest',
-	version="beta0.1",
+	version="0.1",
 	description='Tools to estimate the CMB lensing potential for Python',
 	author='Dominic Beck',
 	author_email='dbeck@apc.in2p3.fr',

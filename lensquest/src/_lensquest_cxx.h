@@ -31,8 +31,6 @@ double sgn(int m) {
 }
 
 
-
-
 void lensTT(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, Alm< xcomplex< double > > & almG,  Alm< xcomplex< double > > & almC, PowSpec& wcl, int nside, arr<double> &weight);
 void lensTE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, Alm< xcomplex< double > > & almG,  Alm< xcomplex< double > > & almC, PowSpec& wcl, int nside, arr<double> &weight);
 void lensEE(Alm< xcomplex< double > > & alm1, Alm< xcomplex< double > > & alm2, Alm< xcomplex< double > > & almG,  Alm< xcomplex< double > > & almC, PowSpec& wcl, int nside, arr<double> &weight);
@@ -94,6 +92,7 @@ void est_phodir(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2
 void est_dipleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG, Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside);
 void est_quadleak(Alm< xcomplex< double > > &alm1, Alm< xcomplex< double > > &alm2, std::string stype, Alm< xcomplex< double > > &almG, Alm< xcomplex< double > > &almC, PowSpec& wcl, PowSpec& dcl, int lmin, int lminCMB1, int lminCMB2,  int lmaxCMB1, int lmaxCMB2, int nside);
 
+std::vector< std::vector<double> > makeAN(PowSpec& wcl, PowSpec& dcl, PowSpec& rdcls, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB1, size_t lminCMB2, size_t lmaxCMB1, size_t lmaxCMB2);
 std::vector< std::vector<double> > makeA_syst(PowSpec& wcl, PowSpec& dcl, PowSpec& rdcls, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB, size_t type);
 std::vector< std::vector< std::vector< std::vector<double> > > > makeAN_syst(PowSpec& wcl, PowSpec& dcl, size_t lmin, size_t lmax, size_t lminCMB1, size_t lminCMB2, size_t lmaxCMB1, size_t lmaxCMB2);
 std::vector< std::vector<double> > makeA_dust(PowSpec& wcl, PowSpec& dcl1, PowSpec& dcl2, PowSpec& R1, PowSpec& R2, PowSpec& rdcls, PowSpec& al, size_t lmin, size_t lmax, size_t lminCMB);
@@ -107,3 +106,5 @@ void alm2map_(sharp_cxxjob<double> &job,  Alm<xcomplex<double> > &almG, Healpix_
 
 void lensCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD);
 void systCls(PowSpec& llcl, PowSpec& ulcl, std::vector<double> &clDD, int type);
+
+std::vector< std::vector<double> > computeKernel(std::string stype, PowSpec& wcl, PowSpec& dcl, size_t lminCMB, size_t L);

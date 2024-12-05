@@ -122,7 +122,6 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 		wcl_=ndarray2cl4(wcl_c[0], wcl_c[1], wcl_c[2], wcl_c[3], lmaxCMB_)
 		dcl_=ndarray2cl4(dcl_c[0], dcl_c[1], dcl_c[2], dcl_c[3], lmaxCMB_)
 		if bias: rdcl_=ndarray2cl4(rdcl_c[0], rdcl_c[1], rdcl_c[2], rdcl_c[3], lmaxCMB_)
-		
 		nspecout=6
 
 	cdef PowSpec *al_=new PowSpec(nspecout,lmax_)
@@ -151,6 +150,7 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 		al["EE"] = np.zeros(lmax_+1, dtype=np.float64)
 		al["TB"] = np.zeros(lmax_+1, dtype=np.float64)
 		al["EB"] = np.zeros(lmax_+1, dtype=np.float64)
+		al["BB"] = np.zeros(lmax_+1, dtype=np.float64)
 		if bias: 
 			nl["TTTT"]=np.zeros(lmax_+1, dtype=np.float64)
 			nl["TTTE"]=np.zeros(lmax_+1, dtype=np.float64)
@@ -161,12 +161,14 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 			nl["TBTB"]=np.zeros(lmax_+1, dtype=np.float64)
 			nl["TBEB"]=np.zeros(lmax_+1, dtype=np.float64)
 			nl["EBEB"]=np.zeros(lmax_+1, dtype=np.float64)
+			nl["BBBB"]=np.zeros(lmax_+1, dtype=np.float64)
 		for l in xrange(lmin,lmax_+1):
 			al["TT"][l]=al_.tt(l)
 			al["TE"][l]=al_.tg(l)
 			al["EE"][l]=al_.gg(l)
 			al["TB"][l]=al_.tc(l)
 			al["EB"][l]=al_.gc(l)
+			al["BB"][l]=al_.cc(l)
 			if bias: 
 				nl["TTTT"][l]=bias_[0][l]
 				nl["TTTE"][l]=bias_[1][l]
@@ -177,6 +179,7 @@ def quest_norm(wcl, dcl, lmin=2, lmax=None, lminCMB=2, lmaxCMB=None, lminCMB2=No
 				nl["TBTB"][l]=bias_[6][l]
 				nl["TBEB"][l]=bias_[7][l]
 				nl["EBEB"][l]=bias_[8][l]
+				nl["BBBB"][l]=bias_[9][l]
 				
 	del al_
 		

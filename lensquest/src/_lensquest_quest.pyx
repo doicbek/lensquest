@@ -1205,7 +1205,7 @@ def Btemplate(almE, almP, nside=None, lminB=2, lmaxB=None, lminE=2, lmaxE=None, 
 cdef int alm_getn(int l, int m):
 	if not m <= l:
 		raise ValueError("mmax must be <= lmax")
-	return ((m+1)*(m+2))/2 + (m+1)*(l-m)
+	return int(((m+1)*(m+2))/2 + (m+1)*(l-m))
 	
 	
 def lqmap2alm(maps, lmax = None, mmax = None, niter = 3, spin = 2):
